@@ -1,4 +1,7 @@
 
+#ifndef DRONE_HPP
+# define DRONE_HPP
+
 #include "hub.hpp"
 
 class Drone {
@@ -11,3 +14,5 @@ Drone::Drone(int id)
 {
 	this->id = id;
 };
+
+#endif

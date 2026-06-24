@@ -4,4 +4,6 @@ project(fly_in)
 set(CMAKE_CXX_STANDARD 17)
 
 include_directories(reference)
-add_executable(fly_in src/main.cpp)
+add_executable(fly_in src/main.cpp
+        reference/data.hpp
+        reference/fly_in.hpp)
