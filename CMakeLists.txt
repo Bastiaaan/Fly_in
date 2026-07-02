@@ -6,4 +6,11 @@ set(CMAKE_CXX_STANDARD 17)
 include_directories(reference)
 add_executable(fly_in src/main.cpp
         reference/data.hpp
-        reference/fly_in.hpp)
+        reference/fly_in.hpp
+        src/reference/map.cpp
+        src/reference/drone.cpp
+        src/reference/hub.cpp
+        src/reference/system.cpp
+        src/reference/data.cpp
+        src/utils.cpp
+)

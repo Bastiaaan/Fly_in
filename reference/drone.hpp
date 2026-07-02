@@ -2,17 +2,12 @@
 #ifndef DRONE_HPP
 # define DRONE_HPP
 
-#include "hub.hpp"
+#include "fly_in.hpp"
 
 class Drone {
 	public:
 		int id;
-		Drone(int id): id(id);
-};
-
-Drone::Drone(int id)
-{
-	this->id = id;
+		Drone(int id);
 };
 
 #endif

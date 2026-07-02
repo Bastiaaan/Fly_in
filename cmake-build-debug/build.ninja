@@ -56,6 +56,48 @@ build CMakeFiles/fly_in.dir/src/main.cpp.o: CXX_COMPILER__fly_in_unscanned_Debug
   OBJECT_DIR = CMakeFiles/fly_in.dir
   OBJECT_FILE_DIR = CMakeFiles/fly_in.dir/src
 
+build CMakeFiles/fly_in.dir/src/reference/map.cpp.o: CXX_COMPILER__fly_in_unscanned_Debug /home/brogaar/core/fly_in/src/reference/map.cpp || cmake_object_order_depends_target_fly_in
+  DEP_FILE = CMakeFiles/fly_in.dir/src/reference/map.cpp.o.d
+  FLAGS = -g -std=gnu++17 -fcolor-diagnostics
+  INCLUDES = -I/home/brogaar/core/fly_in/reference
+  OBJECT_DIR = CMakeFiles/fly_in.dir
+  OBJECT_FILE_DIR = CMakeFiles/fly_in.dir/src/reference
+
+build CMakeFiles/fly_in.dir/src/reference/drone.cpp.o: CXX_COMPILER__fly_in_unscanned_Debug /home/brogaar/core/fly_in/src/reference/drone.cpp || cmake_object_order_depends_target_fly_in
+  DEP_FILE = CMakeFiles/fly_in.dir/src/reference/drone.cpp.o.d
+  FLAGS = -g -std=gnu++17 -fcolor-diagnostics
+  INCLUDES = -I/home/brogaar/core/fly_in/reference
+  OBJECT_DIR = CMakeFiles/fly_in.dir
+  OBJECT_FILE_DIR = CMakeFiles/fly_in.dir/src/reference
+
+build CMakeFiles/fly_in.dir/src/reference/hub.cpp.o: CXX_COMPILER__fly_in_unscanned_Debug /home/brogaar/core/fly_in/src/reference/hub.cpp || cmake_object_order_depends_target_fly_in
+  DEP_FILE = CMakeFiles/fly_in.dir/src/reference/hub.cpp.o.d
+  FLAGS = -g -std=gnu++17 -fcolor-diagnostics
+  INCLUDES = -I/home/brogaar/core/fly_in/reference
+  OBJECT_DIR = CMakeFiles/fly_in.dir
+  OBJECT_FILE_DIR = CMakeFiles/fly_in.dir/src/reference
+
+build CMakeFiles/fly_in.dir/src/reference/system.cpp.o: CXX_COMPILER__fly_in_unscanned_Debug /home/brogaar/core/fly_in/src/reference/system.cpp || cmake_object_order_depends_target_fly_in
+  DEP_FILE = CMakeFiles/fly_in.dir/src/reference/system.cpp.o.d
+  FLAGS = -g -std=gnu++17 -fcolor-diagnostics
+  INCLUDES = -I/home/brogaar/core/fly_in/reference
+  OBJECT_DIR = CMakeFiles/fly_in.dir
+  OBJECT_FILE_DIR = CMakeFiles/fly_in.dir/src/reference
+
+build CMakeFiles/fly_in.dir/src/reference/data.cpp.o: CXX_COMPILER__fly_in_unscanned_Debug /home/brogaar/core/fly_in/src/reference/data.cpp || cmake_object_order_depends_target_fly_in
+  DEP_FILE = CMakeFiles/fly_in.dir/src/reference/data.cpp.o.d
+  FLAGS = -g -std=gnu++17 -fcolor-diagnostics
+  INCLUDES = -I/home/brogaar/core/fly_in/reference
+  OBJECT_DIR = CMakeFiles/fly_in.dir
+  OBJECT_FILE_DIR = CMakeFiles/fly_in.dir/src/reference
+
+build CMakeFiles/fly_in.dir/src/utils.cpp.o: CXX_COMPILER__fly_in_unscanned_Debug /home/brogaar/core/fly_in/src/utils.cpp || cmake_object_order_depends_target_fly_in
+  DEP_FILE = CMakeFiles/fly_in.dir/src/utils.cpp.o.d
+  FLAGS = -g -std=gnu++17 -fcolor-diagnostics
+  INCLUDES = -I/home/brogaar/core/fly_in/reference
+  OBJECT_DIR = CMakeFiles/fly_in.dir
+  OBJECT_FILE_DIR = CMakeFiles/fly_in.dir/src
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target fly_in
@@ -64,7 +106,7 @@ build CMakeFiles/fly_in.dir/src/main.cpp.o: CXX_COMPILER__fly_in_unscanned_Debug
 #############################################
 # Link the executable fly_in
 
-build fly_in: CXX_EXECUTABLE_LINKER__fly_in_Debug CMakeFiles/fly_in.dir/src/main.cpp.o
+build fly_in: CXX_EXECUTABLE_LINKER__fly_in_Debug CMakeFiles/fly_in.dir/src/main.cpp.o CMakeFiles/fly_in.dir/src/reference/map.cpp.o CMakeFiles/fly_in.dir/src/reference/drone.cpp.o CMakeFiles/fly_in.dir/src/reference/hub.cpp.o CMakeFiles/fly_in.dir/src/reference/system.cpp.o CMakeFiles/fly_in.dir/src/reference/data.cpp.o CMakeFiles/fly_in.dir/src/utils.cpp.o
   FLAGS = -g
   OBJECT_DIR = CMakeFiles/fly_in.dir
   POST_BUILD = :
