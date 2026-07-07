@@ -6,12 +6,15 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <optional>
 #include <regex>
 #include <sstream>
 #include <string>
+#include <tuple>
 #include <vector>
 
 #include "hub.hpp"
+#include "connection.hpp"
 #include "data.hpp"
 #include "drone.hpp"
 #include "system.hpp"

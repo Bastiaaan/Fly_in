@@ -29,8 +29,19 @@ int main(void)
             throw invalid_argument("invalid input.");
     }
     System system;
-    vector<int> options = system.get_options(difficulty);
-    for (int i = 0; i < options.size(); i++)
-        cout << "Option #" << options[i] << endl;
+    vector<tuple<int, string, string>> options = system.get_options(difficulty);
+    cout << "=========== Choose a map " << '(' << difficulty << ')' << " ===========" << endl;
+    for (auto &option : options)
+        cout << get<0>(option) << ": " << get<1>(option) << endl;
+    int chosenMap;
+    cin >> chosenMap;
+    if (chosenMap < get<0>(options[0]) ||
+        chosenMap > get<0>(options[options.size() - 1]))
+    {
+        cout << "Invalid choice (" << chosenMap << "). try again" << endl;
+        return 1;
+    }
+    else
+        system.Load(get<2>(options[chosenMap - 1]), difficulty);
 	return 0;
 };

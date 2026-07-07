@@ -5,15 +5,14 @@
 #include "fly_in.hpp"
 #include "system.hpp"
 
-// template<typename T>
+template<class T>
 class Data {
+    private:
+        T value{};
 	public:
-        // T *dest;
-		int nb_drones;
-		void read_data(std::string &path);
-		string get_path(int difficulty, int option);
-        bool map_exists(std::string &difficulty, int level);
-        // void map_meta_data(T type);
+        Data(const T& value);
+        Data() = default;
+        ~Data() = default;
 };
 
 #endif

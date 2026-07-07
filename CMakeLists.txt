@@ -13,4 +13,7 @@ add_executable(fly_in src/main.cpp
         src/reference/system.cpp
         src/reference/data.cpp
         src/utils.cpp
+        reference/connection.hpp
+        src/reference/connection.cpp
+        src/reference/classFactory.tpp
 )

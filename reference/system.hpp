@@ -11,19 +11,19 @@ class System
 {
 	private:
 		int nb_drones;
-        std::string difficulty;
+        string difficulty;
         int level;
+        string mapsBasePath();
 		
 	public:
 		int score;
 		int turns;
 		std::string mapSrc;
-		System();
+        Map _map;
+        int Load(std::string &level, std::string &difficulty);
+        vector<tuple<int, string, string>> get_options(const std::string &difficulty);
+        System();
         ~System();
-        void RegisterMap();
-        int Init(int level, std::string &difficulty);
-        vector<map<int, string>> get_options(const std::string &difficulty);
-		bool preCheckMaps();
 };
 
 #endif
