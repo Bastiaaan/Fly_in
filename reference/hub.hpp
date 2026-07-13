@@ -33,4 +33,18 @@ class Hub {
 		~Hub();
 };
 
+class HubData : public Data<Hub>
+{
+	public:
+		HubData();
+		~HubData();
+	private:
+		string name;
+		int x;
+		int y;
+		optional<string> zone;
+		optional<string> color;
+		optional<int> max_drones;
+};
+
 #endif

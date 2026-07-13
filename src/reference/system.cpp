@@ -9,6 +9,7 @@ using namespace std;
 System::System()
 {
     this->nb_drones = 0;
+    this->level = 0;
     this->score = 0;
     this->difficulty = "TBD";
     this->turns = 0;
@@ -23,16 +24,16 @@ System::~System()
 string System::mapsBasePath()
 {
     string currentPath = filesystem::current_path().string();
-    vector<string> parts = split(currentPath, '/', 0);
+    vector<string> parts = split(currentPath, '/');
     unsigned int fly_in = 0;
     while (parts[fly_in] != "fly_in")
         fly_in++;
     fly_in++;
-    string _core = join(parts, '/', fly_in);
+    string const _core = join(parts, '/', fly_in);
     return _core + "/maps/";
 }
 
-int System::Load(std::string &level, std::string &difficulty)
+int System::Load(std::string const &level, std::string const &difficulty)
 {
     cout << "Initializing Fly-in..." << endl;
     unsigned int line = 1;
@@ -45,7 +46,7 @@ int System::Load(std::string &level, std::string &difficulty)
     vector<Connection> collectedConnections;
     while (getline(_map, buffer))
     {
-        if (buffer.length() > 0)
+        if (!buffer.empty())
         {
             if (buffer[0] != '#')
             {
@@ -60,11 +61,31 @@ int System::Load(std::string &level, std::string &difficulty)
                 string row = keyRow[1];
                 if (key == "start_hub" || key == "end_hub" || key == "hub")
                 {
-                    cout << "hub to be made" << endl;
+                    auto data = Data<Hub>::init();
                     vector<string> values = split(row, ' ');
                     tuple<string, int, int, optional<string>,optional<string>,optional<int>> args;
-                    unsigned int argPos = 0;
-                    //for ()
+                    cout << row << endl;
+                    unsigned int opened_meta = 0;
+                    unsigned int pos = 0;
+                    values.erase(values.begin());
+                    cout << "allowed inserts: " << data.limit << endl;
+                    for (const auto &rec : values)
+                    {
+                        if (rec.find('[') != string::npos)
+                            opened_meta++;
+                        if (opened_meta > 0)
+                        {
+                            if (rec.find(']') != string::npos)
+                                opened_meta--;
+                        }
+                        cout << rec << ", ";
+                        pos++;
+                    }
+                    if (opened_meta != 0) {
+                        cerr << "Config error at line " << line << ", brackets must be enclosed" << endl;
+                        return 0;
+                    }
+                    cout << endl;
                 }
                 else if(key == "connection")
                 {

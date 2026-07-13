@@ -39,3 +39,9 @@ Hub::~Hub()
 {
 
 }
+
+HubData::HubData()
+{
+    this->limit = 6;
+    this->index = 0;
+}
