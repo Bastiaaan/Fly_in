@@ -4,44 +4,6 @@
 
 #include "../reference/fly_in.hpp"
 
-template<class C>
-Data<C> Data<C>::init() {
-    Data data;
-    if (typeid(C) == typeid(Connection))
-    {
-        data = ConnectionData();
-        data.setLimit(3);
-    }
-    else if (typeid(C) == typeid(Hub))
-    {
-        data = HubData();
-        data.setLimit(6);
-    }
-    else
-        data = nullptr;
-    return data;
-}
-
-template <class C>
-void Data<C>::setLimit(int id)
-{
-    this->limit = id;
-}
-
-template<class C>
-template<typename T>
-void Data<C>::insert(T &type)
-{
-    if (this->index < this->limit)
-    {
-        get<this->index>();
-        ++this->index;
-    }
-    else {
-        cerr << "ERROR INSERTING DATA ROW FROM MAP" << endl;
-    }
-}
-
 vector<string> split(const string &s, char delimiter, unsigned int size)
 {
     vector<string> parts;

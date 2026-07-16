@@ -3,6 +3,7 @@
 # define DRONE_HPP
 
 #include "fly_in.hpp"
+#pragma once
 
 class Drone {
 	public:

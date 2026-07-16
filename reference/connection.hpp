@@ -1,31 +1,25 @@
 #ifndef CONNECTION_HPP
 # define CONNECTION_HPP
+
 #include "fly_in.hpp"
-#include "abstractions.hpp"
-#include "hub.hpp"
+#include "system.hpp"
+#include "map.hpp"
+#pragma once
 
 class Connection
 {
     public:
-        std::string conn_name;
+        Hub *hub1;
+        Hub *hub2;
         std::optional<int> max_link_capacity;
-        Connection(std::string const &hub1, std::string const &hub2, std::optional<int> mlc);
+        Connection();
         ~Connection();
-
+        void setHub1(Map &map, std::string const &hub1);
+        void setHub2(Map &map, std::string const &hub2);
+        void setMlc(optional<int> mlc);
     private:
-        bool validate_connection();
-        void establish();
-};
-
-class ConnectionData : public Data<Connection>
-{
-    public:
-        ConnectionData();
-        ~ConnectionData();
-    private:
-        string hub1;
-        string hub2;
-        std::optional<int> mlc;
+        ExecuteState validate_connection(Map &map);
+        ExecuteState establish();
 };
 
 #endif

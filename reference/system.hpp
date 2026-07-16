@@ -7,21 +7,32 @@
 
 using namespace std;
 
+using Result = variant<int, string, bool, char>;
+
+struct ExecuteState
+{
+    bool success;
+    optional<Result> result;
+    optional<int> line;
+    optional<std::string> why;
+};
+
 class System
 {
 	private:
-		int nb_drones;
         string difficulty;
         int level;
         static string mapsBasePath();
 		
 	public:
 		int score;
-		int turns;
+		int turn;
+        int nb_drones;
 		std::string mapSrc;
         Map _map;
-        int Load(std::string const &level, std::string const &difficulty);
+        ExecuteState* Load(std::string const &level, std::string const &difficulty);
         vector<tuple<int, string, string>> get_options(const std::string &difficulty);
+        void verbose_state(ExecuteState *ex);
         System();
         ~System();
 };

@@ -6,7 +6,14 @@
 
 void Map::add(Hub &hub)
 {
-    this->hubs.push_back(hub);
+    try
+    {
+        this->hubs.push_back(hub);
+    }
+    catch(exception ex)
+    {
+        cerr << "could not add hub" << endl;
+    }
 }
 
 Map::Map()
@@ -26,4 +33,19 @@ Map::Map(string &name,
 Map::~Map()
 {
     cout << "decon.." << endl;
+}
+
+void Map::setName(string &name)
+{
+    this->name = name;
+}
+
+void Map::setDifficulty(string &difficulty)
+{
+    this->difficulty = difficulty;
+}
+
+void Map::setSrcPath(string &path)
+{
+    this->srcPath = path;
 }

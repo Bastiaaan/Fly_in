@@ -42,6 +42,10 @@ int main(void)
         return 1;
     }
     else
-        system.Load(get<2>(options[chosenMap - 1]), difficulty);
+    {
+        auto result = system.Load(get<2>(options[chosenMap - 1]), difficulty);
+        cout << "execution succeeded: " << (*result->why) << endl;
+        delete result;
+    }
 	return 0;
 };
