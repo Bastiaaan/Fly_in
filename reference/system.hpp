@@ -2,19 +2,34 @@
 #ifndef SYSTEM_HPP
 # define SYSTEM_HPP
 
+#include <any>
 #include "fly_in.hpp"
 #include "map.hpp"
 
 using namespace std;
 
-using Result = variant<int, string, bool, char>;
-
 struct ExecuteState
 {
-    bool success;
-    optional<Result> result;
-    optional<int> line;
+    bool success = NULL;
+    std::any result;
+    optional<unsigned int> line;
     optional<std::string> why;
+	static ExecuteState Fail(std::string const &reason, unsigned int line = -1)
+	{
+		ExecuteState s;
+		s.success = false;
+		if (line > 0)
+			s.line = line;
+		s.why = reason;
+		return s;
+	}
+	static ExecuteState Ok(std::any const &result)
+	{
+		ExecuteState s;
+		s.success = true;
+		s.result = result;
+		return s;
+	}
 };
 
 class System
@@ -22,7 +37,7 @@ class System
 	private:
         string difficulty;
         int level;
-        static string mapsBasePath();
+        static ExecuteState mapsBasePath();
 		
 	public:
 		int score;
@@ -30,9 +45,9 @@ class System
         int nb_drones;
 		std::string mapSrc;
         Map _map;
-        ExecuteState* Load(std::string const &level, std::string const &difficulty);
+        ExecuteState Load(std::string const &level, std::string const &difficulty);
         vector<tuple<int, string, string>> get_options(const std::string &difficulty);
-        void verbose_state(ExecuteState *ex);
+        static void verboseFree(ExecuteState const &ex);
         System();
         ~System();
 };

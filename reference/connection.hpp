@@ -14,8 +14,8 @@ class Connection
         std::optional<int> max_link_capacity;
         Connection();
         ~Connection();
-        void setHub1(Map &map, std::string const &hub1);
-        void setHub2(Map &map, std::string const &hub2);
+        void setHub1(Hub *hub1);
+        void setHub2(Hub *hub2);
         void setMlc(optional<int> mlc);
     private:
         ExecuteState validate_connection(Map &map);

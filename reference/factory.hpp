@@ -1,11 +1,17 @@
 #ifndef FACTORY_HPP
 # define FACTORY_HPP
 #include "fly_in.hpp"
+#pragma once
 
 struct Argument
 {
     string key;
-    string value;
+    variant<int, optional<int>, bool, std::string, optional<string>, char, double, Hub*> value;
+    Argument& operator=(Argument &&n) {
+        key = move(n.key);
+        value = move(n.value);
+        return *this;
+    }
 };
 
 template<class C>

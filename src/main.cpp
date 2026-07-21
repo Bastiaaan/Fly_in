@@ -3,7 +3,7 @@
 
 using namespace std;
 
-int main(void)
+int main()
 {
     string difficulty;
     int input;
@@ -41,11 +41,8 @@ int main(void)
         cout << "Invalid choice (" << chosenMap << "). try again" << endl;
         return 1;
     }
-    else
-    {
-        auto result = system.Load(get<2>(options[chosenMap - 1]), difficulty);
-        cout << "execution succeeded: " << (*result->why) << endl;
-        delete result;
-    }
+    auto result = system.Load(get<2>(options[chosenMap - 1]), difficulty);
+    if (!result.success)
+        cout << "So here's what happened: " << result.why.value() << endl;
 	return 0;
 };

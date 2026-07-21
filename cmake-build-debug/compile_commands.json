@@ -40,11 +40,5 @@
   "command": "/usr/bin/c++  -I\"/home/schapendixie88/Coder projects/codam/core/fly_in/reference\" -g -fdiagnostics-color=always -o CMakeFiles/fly_in.dir/src/reference/connection.cpp.o -c \"/home/schapendixie88/Coder projects/codam/core/fly_in/src/reference/connection.cpp\"",
   "file": "/home/schapendixie88/Coder projects/codam/core/fly_in/src/reference/connection.cpp",
   "output": "CMakeFiles/fly_in.dir/src/reference/connection.cpp.o"
-},
-{
-  "directory": "/home/schapendixie88/Coder projects/codam/core/fly_in/cmake-build-debug",
-  "command": "/usr/bin/c++  -I\"/home/schapendixie88/Coder projects/codam/core/fly_in/reference\" -g -fdiagnostics-color=always -o CMakeFiles/fly_in.dir/src/reference/factory.cpp.o -c \"/home/schapendixie88/Coder projects/codam/core/fly_in/src/reference/factory.cpp\"",
-  "file": "/home/schapendixie88/Coder projects/codam/core/fly_in/src/reference/factory.cpp",
-  "output": "CMakeFiles/fly_in.dir/src/reference/factory.cpp.o"
 }
 ]

@@ -11,34 +11,17 @@ Connection::Connection()
 
 Connection::~Connection()
 {
-    delete this->hub1;
-    delete this->hub2;
+
 }
 
-void Connection::setHub1(Map &map, const std::string &hub1)
+void Connection::setHub1(Hub *hub1)
 {
-    auto byName = [&map](string const &hub_name)-> Hub* {
-        for (auto &hub : map.hubs)
-        {
-            if (hub.name == hub_name)
-                return &hub;
-        }
-        return nullptr;
-    };
-    this->hub1 = byName(hub1);
+    this->hub1 = hub1;
 }
 
-void Connection::setHub2(Map &map, std::string const &hub2)
+void Connection::setHub2(Hub *hub2)
 {
-    auto byName = [&map](string const &hub_name)-> Hub* {
-        for (auto &hub : map.hubs)
-        {
-            if (hub.name == hub_name)
-                return &hub;
-        }
-        return nullptr;
-    };
-    this->hub2 = byName(hub2);
+    this->hub2 = hub2;
 }
 
 void Connection::setMlc(optional<int> mlc)
