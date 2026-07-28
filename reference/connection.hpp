@@ -1,10 +1,9 @@
-#ifndef CONNECTION_HPP
-# define CONNECTION_HPP
-
-#include "fly_in.hpp"
-#include "system.hpp"
-#include "map.hpp"
 #pragma once
+#include "hub.hpp"
+#include "system.hpp"
+
+struct ExecuteState;
+class Map;
 
 class Connection
 {
@@ -12,14 +11,12 @@ class Connection
         Hub *hub1;
         Hub *hub2;
         std::optional<int> max_link_capacity;
-        Connection();
-        ~Connection();
+        Connection() = default;
+        ~Connection() = default;
         void setHub1(Hub *hub1);
         void setHub2(Hub *hub2);
-        void setMlc(optional<int> mlc);
-    private:
-        ExecuteState validate_connection(Map &map);
-        ExecuteState establish();
+        void setMlc(optional<int> max_link_capacity);
+        ExecuteState validate_connection(Map &map) const;
+        ExecuteState drone_forward(Map &map) const;
+        ExecuteState drone_backward(Map &map) const;
 };
-
-#endif

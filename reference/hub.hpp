@@ -1,11 +1,8 @@
 
-#ifndef HUB_HPP
-# define HUB_HPP
-
-#include "fly_in.hpp"
 #pragma once
+# include "drone.hpp"
 
-using namespace std;
+class Connection;
 
 enum Zone
 {
@@ -16,23 +13,27 @@ enum Zone
 };
 
 class Hub {
-    optional<string> color;
-    optional<int> max_drones;
-    optional<Zone> zone;
-    int position_x;
-    int position_y;
+    std::optional<std::string> color;
+    std::optional<int> max_drones;
+    std::optional<Zone> zone;
+    bool start;
+    bool end;
 	public:
-		Hub();
-		~Hub();
-        string name;
-        vector<Drone> drones;
-        void setName(string name);
+		Hub() = default;
+		~Hub() = default;
+		std::string name;
+		int position_x;
+		int position_y;
+        std::vector<Drone*> drones;
+        void setName(std::string name);
         void setX(int x);
         void setY(int y);
-        void setZone(optional<string> zoneName);
-        void setColor(optional<string> color);
-        void setMaxDrones(optional<int> max_drones);
+        void setZone(std::optional<std::string> const &zoneName);
+        void setColor(std::optional<std::string> const &color);
+        void setMaxDrones(std::optional<int> max_drones);
+		void setStartOrEnd(std::string const &soe);
+		bool isStart() const;
+		bool isEnd() const;
+        void dropInfo() const;
 
 };
-
-#endif

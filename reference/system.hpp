@@ -1,16 +1,17 @@
 
-#ifndef SYSTEM_HPP
-# define SYSTEM_HPP
+#pragma once
 
 #include <any>
-#include "fly_in.hpp"
 #include "map.hpp"
+#include "validator.hpp"
 
 using namespace std;
 
+class Validator;
+
 struct ExecuteState
 {
-    bool success = NULL;
+    bool success = false;
     std::any result;
     optional<unsigned int> line;
     optional<std::string> why;
@@ -23,11 +24,14 @@ struct ExecuteState
 		s.why = reason;
 		return s;
 	}
-	static ExecuteState Ok(std::any const &result)
+	static ExecuteState Ok(std::optional<std::any> const &result)
 	{
 		ExecuteState s;
 		s.success = true;
-		s.result = result;
+        if (result.has_value())
+		    s.result = result.value();
+        else
+            s.result = "Ok";
 		return s;
 	}
 };
@@ -45,11 +49,10 @@ class System
         int nb_drones;
 		std::string mapSrc;
         Map _map;
+        Validator* validator;
         ExecuteState Load(std::string const &level, std::string const &difficulty);
         vector<tuple<int, string, string>> get_options(const std::string &difficulty);
         static void verboseFree(ExecuteState const &ex);
         System();
         ~System();
 };
-
-#endif

@@ -18,7 +18,8 @@ std::map<int, Argument> Factory<C>::ready_args()
     {
         args_container[0] = {.key = "hub1", .value = string("")};
         args_container[1] = {.key = "hub2", .value = string("")};
-        args_container[2] = {.key = "mlc", .value = string("")};
+        args_container[2] = {.key = "max_link_capacity", .value = string("")};
+        args_container[3] = {.key = "map", .value = string("")};
     }
     else
         cerr << "Invalid type detected." << endl;
@@ -31,12 +32,18 @@ C Factory<C>::create(map<int, Argument> &args)
     C _ret;
     if constexpr (is_same_v<C, Hub>)
     {
-        _ret.setName(get<string>(args[0].value));
-        _ret.setX(stoi(get<string>(args[1].value)));
-        _ret.setY(stoi(get<string>(args[2].value)));
-        _ret.setZone(get<string>(args[3].value));
-        _ret.setColor(get<string>(args[4].value));
-        if (!get<string>(args[5].value).empty())
+        if (resolveKey("name", args) != -1)
+            _ret.setName(get<string>(args[resolveKey("name", args)].value));
+        if (resolveKey("x", args) != -1)
+            _ret.setX(stoi(get<string>(args[resolveKey("x", args)].value)));
+        if (resolveKey("y", args) != -1)
+            _ret.setY(stoi(get<string>(args[resolveKey("y", args)].value)));
+        if (resolveKey("zone", args) != -1)
+            _ret.setZone(get<string>(args[resolveKey("zone", args)].value));
+        if (resolveKey("color", args) != -1)
+            _ret.setColor(get<string>(args[resolveKey("color", args)].value));
+        if (resolveKey("max_drones", args) != -1
+            && !get<string>(args[resolveKey("max_drones", args)].value).empty())
         {
             int conv = stoi(get<string>(args[5].value));
             _ret.setMaxDrones(conv);
@@ -44,13 +51,14 @@ C Factory<C>::create(map<int, Argument> &args)
     }
     else if constexpr (is_same_v<C, Connection>)
     {
-        _ret.setHub1(get<Hub*>(args[0].value));
-        _ret.setHub2(get<Hub*>(args[1].value));
-        if (!get<string>(args[2].value).empty())
+        if (resolveKey("hub1", args) != -1)
+            _ret.setHub1(get<Hub*>(args[resolveKey("hub1", args)].value));
+        if (resolveKey("hub2", args) != -1)
+            _ret.setHub2(get<Hub*>(args[resolveKey("hub2", args)].value));
+        if (resolveKey("max_link_capacity", args) != -1 && !get<string>(args[2].value).empty())
         {
             int conv = stoi(get<string>(args[2].value));
             _ret.setMlc(conv);
-            cout << "[optional] max-link-capacity has been saved" << endl;
         }
     }
     else if constexpr (is_same_v<C, Map>)
@@ -60,4 +68,20 @@ C Factory<C>::create(map<int, Argument> &args)
         _ret.setSrcPath(args[2].value);
     }
     return _ret;
+}
+
+template<class C>
+int Factory<C>::resolveKey(const std::string &key, std::map<int, Argument> &args)
+{
+    auto fromKey = [&args](std::string const &_key) -> int {
+        int index = 0;
+        for (auto &arg: args)
+        {
+            if (arg.second.key == _key)
+                return index;
+            index++;
+        }
+        return -1;
+    };
+    return fromKey(key);
 }

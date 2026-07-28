@@ -4,7 +4,7 @@
 
 #include "../../reference/fly_in.hpp"
 
-void Map::add(Hub &hub)
+void Map::addHub(Hub *hub)
 {
     try
     {
@@ -16,9 +16,16 @@ void Map::add(Hub &hub)
     }
 }
 
-Map::Map()
+void Map::addConnection(Connection &connection)
 {
-
+    try
+    {
+        this->connections.push_back(connection);
+    }
+    catch (exception ex)
+    {
+        cerr << "could not add a new connection: " << ex.what() << endl;
+    }
 }
 
 Map::Map(string &name,
@@ -28,11 +35,6 @@ Map::Map(string &name,
     this->name = name;
     this->srcPath = srcPath;
     this->difficulty = difficulty;
-}
-
-Map::~Map()
-{
-    cout << "decon.." << endl;
 }
 
 void Map::setName(string &name)

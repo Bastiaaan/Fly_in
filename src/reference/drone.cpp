@@ -3,3 +3,8 @@
 //
 
 #include "../../reference/fly_in.hpp"
+
+Drone::Drone(int id)
+{
+    this->id = id;
+}

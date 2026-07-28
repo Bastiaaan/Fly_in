@@ -1,0 +1,3 @@
+/home/brogaar/core/fly_in/build/CMakeFiles/fly_in.dir
+/home/brogaar/core/fly_in/build/CMakeFiles/edit_cache.dir
+/home/brogaar/core/fly_in/build/CMakeFiles/rebuild_cache.dir

@@ -17,6 +17,7 @@ System::System()
     this->difficulty = "TBD";
     this->turn = 0;
     this->_map = Map();
+    this->validator = new Validator();
 }
 
 System::~System()
@@ -59,140 +60,153 @@ ExecuteState System::mapsBasePath()
 
 ExecuteState System::Load(std::string const &level, std::string const &difficulty)
 {
-    auto state = new ExecuteState();
     cout << "Initializing Fly-in..." << endl;
-    unsigned int line = 1;
     auto mapResult = mapsBasePath();
-    if (mapResult.success != false)
+    if (mapResult.success)
     {
+        unsigned int line = 0;
         auto result = mapResult.result;
-        string const base = any_cast<string>(result);
+        string const &base = any_cast<string>(result);
         string const target = base + difficulty + '/' + level;
         ifstream _mapped(target);
         if (!_mapped.is_open())
-        {
-            return ExecuteState::Fail("Could not open map '" + target + "'\n", line);
-        }
-        string buffer;
+            return ExecuteState::Fail("Could not open map '" + target + "'", 0);
         vector<Connection> collectedConnections;
-        while (getline(_mapped, buffer))
+        try
         {
-            if (!buffer.empty())
+            string buffer;
+            while (getline(_mapped, buffer))
             {
-                if (buffer[0] != '#')
+                line++;
+                ExecuteState res = this->validator->saveRec(buffer, line);
+                if (!res.success)
+                    throw std::logic_error(std::any_cast<string>(res.why));
+                if (!buffer.empty())
                 {
-                    vector<string> keyRow = split(buffer, ':');
-                    if (keyRow.size() != 2) {
-                        _mapped.close();
-                        return ExecuteState::Fail("Each row should only contain one double column\n", line);
-                    }
-                    string const key = keyRow[0];
-                    string const row = keyRow[1];
-                    if (key == "start_hub" || key == "end_hub" || key == "hub")
+                    if (buffer[0] != '#')
                     {
-                        vector<string> values = split(row, ' ');
-                        unsigned int opened_meta = 0;
-                        int pos = 0;
-                        values.erase(values.begin());
-                        map<int, Argument> args = Factory<Hub>::ready_args();
-                        for (const auto &rec : values)
+                        vector<string> keyRow = split(buffer, ':');
+                        if (keyRow.size() != 2) {
+                            _mapped.close();
+                            return ExecuteState::Fail("Each row should only contain one double column", line);
+                        }
+                        string const &key = keyRow[0];
+                        string const &row = keyRow[1];
+                        if (key == "start_hub" || key == "end_hub" || key == "hub")
                         {
-                            if (rec.find('[') != string::npos)
-                                opened_meta++;
-                            if (opened_meta > 0)
+                            vector<string> values = split(row, ' ');
+                            unsigned int opened_meta = 0;
+                            int pos = 0;
+                            values.erase(values.begin());
+                            map<int, Argument> args = Factory<Hub>::ready_args();
+                            for (const auto &rec : values)
                             {
-                                vector<string> meta_pairs = split(rec, '=');
-                                if (meta_pairs.size() != 2)
-                                {
-                                    _mapped.close();
-                                    return ExecuteState::Fail("unusual assignments found\n", line);
-                                }
-                                string metaName = meta_pairs[0];
-                                string metaValue = meta_pairs[1];
-                                if (metaName.find('[') != string::npos && metaName[0] == '[')
-                                    metaName.erase(0, 1);
-                                if (metaValue.find(']') != string::npos && metaValue[metaValue.size() - 1] == ']')
-                                    metaValue.erase(metaValue.size() - 1, 1);
-                                if (args[pos].key != metaName)
-                                {
-                                    while (args[pos].key != metaName)
-                                        pos++;
-                                }
-                                args[pos].value = metaValue;
-                                if (rec.find(']') != string::npos)
-                                    opened_meta--;
-                            }
-                            else
-                            {
-                                args[pos].value = rec;
-                                pos++;
-                            }
-                        }
-                        if (opened_meta != 0) {
-                            _mapped.close();
-                            return ExecuteState::Fail("Brackets must be enclosed.\n", line);
-                        }
-                        Hub _hub = Factory<Hub>::create(args);
-                        this->_map.hubs.push_back(_hub);
-                        cout << endl;
-                    }
-                    else if(key == "connection")
-                    {
-                        auto args = Factory<Connection>::ready_args();
-                        vector<string> values = split(row, ' ');
-                        values.erase(values.begin()); // necessary to cut out empty records.
-                        if (values.empty() || values.size() > 2)
-                        {
-                            _mapped.close();
-                            return ExecuteState::Fail("Connection definition must consist out of <hub_name>-<hub_name> [...]\n", line);
-                        }
-                        vector<string> hubs = split(values[0], '-');
-                        if (hubs.size() != 2)
-                        {
-                            _mapped.close();
-                            return ExecuteState::Fail("Invalid connection definition detected\n", line);
-                        }
-                        Map map = this->_map;
-                        auto getByHubName = [&map](std::string const &hubName) -> Hub*
-                        {
-                            for (auto& h : map.hubs)
-                            {
-                                if (h.name == hubName)
-                                    return &h;
-                            }
-                            return nullptr;
-                        };
-                        if (getByHubName(hubs[0]) == nullptr)
-                        {
-                            _mapped.close();
-                            return ExecuteState::Fail("First hub is not found\n", line);
-                        }
-                        if (getByHubName(hubs[1]) == nullptr)
-                        {
-                            _mapped.close();
-                            return ExecuteState::Fail("Second hub is not found\n", line);
-                        }
+                                if (rec.find('[') != string::npos)
+                                    opened_meta++;
 
-                        args[0].value = getByHubName(hubs[0]);
-                        args[1].value = getByHubName(hubs[1]);
-                        cout << "how many values in this connection: " << values.size() << endl;
-                        auto connection = Factory<Connection>::create(args);
+                                if (opened_meta > 0)
+                                {
+                                    vector<string> meta_pairs = split(rec, '=');
+                                    if (meta_pairs.size() != 2)
+                                        throw std::logic_error("unusual assignments found");
+                                    string metaName = meta_pairs[0];
+                                    string metaValue = meta_pairs[1];
+                                    if (metaName.find('[') != string::npos && metaName[0] == '[')
+                                        metaName.erase(0, 1);
+                                    if (metaValue.find(']') != string::npos && metaValue[metaValue.size() - 1] == ']')
+                                        metaValue.erase(metaValue.size() - 1, 1);
+                                    int index = Factory<Hub>::resolveKey(metaName, args);
+                                    args[index].value = metaValue;
+                                    if (rec.find(']') != string::npos)
+                                        opened_meta--;
+                                }
+                                else
+                                {
+                                    args[pos].value = rec;
+                                    pos++;
+                                }
+                            }
+                            if (opened_meta != 0)
+                                throw std::logic_error("Incorrect meta enclosure found");
+                            Hub _hub = Factory<Hub>::create(args);
+                            if (key == "start_hub")
+                                _hub.start = true;
+                            this->_map.addHub(&_hub);
+                        }
+                        else if(key == "connection")
+                        {
+                            auto args = Factory<Connection>::ready_args();
+                            vector<string> values = split(row, ' ');
+                            values.erase(values.begin()); // necessary to cut out empty records.
+                            if (values.empty() || values.size() > 2)
+                                throw logic_error("Connection definition must consist out of <hub_name>-<hub_name> [...]");
+                            vector<string> hubs = split(values[0], '-');
+                            if (hubs.size() != 2)
+                                throw logic_error("Invalid connection definition detected");
+                            Map map = this->_map;
+                            auto getByHubName = [&map](std::string const &hubName) -> Hub*
+                            {
+                                for (auto const h : map.hubs)
+                                {
+                                    if (h->name == hubName)
+                                        return h;
+                                }
+                                return nullptr;
+                            };
 
-                    }
-                    else if(key == "nb_drones")
-                        this->nb_drones = stoi(row);
-                    else
-                    {
-                        _mapped.close();
-                        return ExecuteState::Fail("Unknown config key found.\n", line);
+                            if (getByHubName(hubs[0]) == nullptr)
+                                throw range_error("First hub is not found");
+                            if (getByHubName(hubs[1]) == nullptr)
+                                throw range_error("Second hub is not found");
+                            int hub1 = Factory<Connection>::resolveKey("hub1", args);
+                            int hub2 = Factory<Connection>::resolveKey("hub2", args);
+                            args[hub1].value = getByHubName(hubs[0]);
+                            args[hub2].value = getByHubName(hubs[1]);
+                            if (values.size() == 2)
+                            {
+                                if (values[1].find('[') != string::npos &&
+                                    values[1].find(']') != string::npos)
+                                {
+                                    vector<string> metaKeyValue = split(values[1], '=');
+                                    if (metaKeyValue.size() != 2)
+                                        throw std::logic_error("Connection row only expects one optional record");
+                                    string _key = metaKeyValue[0].erase(0, 1);
+                                    string value = metaKeyValue[1].erase(metaKeyValue[1].length() - 1, 1);
+                                    int insert = Factory<Connection>::resolveKey(_key, args);
+                                    args[insert].value = value;
+                                }
+                                else if (values[1].find('[') == string::npos ||
+                                         values[1].find(']') == string::npos)
+                                    throw std::logic_error("Custom brackets enclosed incorrectly");
+                            }
+                            int iMap = Factory<Connection>::resolveKey("map", args);
+                            args[iMap].value = this->_map;
+                            auto connection = Factory<Connection>::create(args);
+                            this->_map.addConnection(connection);
+                            ExecuteState connect_result = connection.validate_connection(this->_map);
+                            if (!connect_result.success)
+                                throw std::logic_error("Invalid connection found");
+                        }
+                        else if(key == "nb_drones")
+                            this->nb_drones = stoi(row);
+                        else
+                            throw std::logic_error("Unknown config key found.");
                     }
                 }
             }
-            line++;
+            _mapped.close();
+            return ExecuteState::Ok("Ok");
         }
-        _mapped.close();
-        state->success = true;
-        return ExecuteState::Ok("parsed");
+        catch (std::exception &ex)
+        {
+            _mapped.close();
+            return ExecuteState::Fail(ex.what(), line);
+        }
+        catch (ParseException &pex)
+        {
+            _mapped.close();
+            return ExecuteState::Fail(pex.what());
+        }
     }
     return mapResult;
 }
@@ -204,7 +218,7 @@ vector<tuple<int, string, string>> System::get_options(const std::string &diffic
     int opt = 0;
     regex pattern(R"(^\d{1,2}_[a-z]+(?:_[a-z]+)*\.txt$)");
     auto const mapResult = mapsBasePath();
-    if (mapResult.success == false) {
+    if (!mapResult.success) {
         verboseFree(mapResult);
         return options;
     }

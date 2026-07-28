@@ -1,10 +1,12 @@
 
-#include "../reference/fly_in.hpp"
+#include "fly_in.hpp"
+#include "system.hpp"
 
 using namespace std;
 
 int main()
 {
+    System system;
     string difficulty;
     int input;
     cout << "============ Choose a difficulty ============" << endl;
@@ -28,7 +30,6 @@ int main()
             difficulty = "error";
             throw invalid_argument("invalid input.");
     }
-    System system;
     vector<tuple<int, string, string>> options = system.get_options(difficulty);
     cout << "=========== Choose a map " << '(' << difficulty << ')' << " ===========" << endl;
     for (auto &option : options)
@@ -43,6 +44,13 @@ int main()
     }
     auto result = system.Load(get<2>(options[chosenMap - 1]), difficulty);
     if (!result.success)
-        cout << "So here's what happened: " << result.why.value() << endl;
+    {
+        if (!result.line.has_value())
+            cout << "So here's what happened: " << result.why.value() << endl;
+        else
+            cout << "Error while parsing: " << result.why.value() << " at line " << result.line.value() << endl;
+    }
+    else
+        cout << "parsing successful, let's Fly-In the drones!" << endl;
 	return 0;
 };

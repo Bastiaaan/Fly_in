@@ -1,44 +1,56 @@
 [
 {
-  "directory": "/home/schapendixie88/Coder projects/codam/core/fly_in/cmake-build-debug",
-  "command": "/usr/bin/c++  -I\"/home/schapendixie88/Coder projects/codam/core/fly_in/reference\" -g -fdiagnostics-color=always -o CMakeFiles/fly_in.dir/src/main.cpp.o -c \"/home/schapendixie88/Coder projects/codam/core/fly_in/src/main.cpp\"",
-  "file": "/home/schapendixie88/Coder projects/codam/core/fly_in/src/main.cpp",
-  "output": "CMakeFiles/fly_in.dir/src/main.cpp.o"
+  "directory": "/home/brogaar/core/fly_in/cmake-build-debug",
+  "command": "/usr/bin/c++ -I/home/brogaar/core/fly_in/reference -I/home/brogaar/core/fly_in/raylib/include -g -std=gnu++17 -fcolor-diagnostics -o CMakeFiles/fly_in.dir/src/fly_in.cpp.o -c /home/brogaar/core/fly_in/src/fly_in.cpp",
+  "file": "/home/brogaar/core/fly_in/src/fly_in.cpp",
+  "output": "/home/brogaar/core/fly_in/cmake-build-debug/CMakeFiles/fly_in.dir/src/fly_in.cpp.o"
 },
 {
-  "directory": "/home/schapendixie88/Coder projects/codam/core/fly_in/cmake-build-debug",
-  "command": "/usr/bin/c++  -I\"/home/schapendixie88/Coder projects/codam/core/fly_in/reference\" -g -fdiagnostics-color=always -o CMakeFiles/fly_in.dir/src/reference/map.cpp.o -c \"/home/schapendixie88/Coder projects/codam/core/fly_in/src/reference/map.cpp\"",
-  "file": "/home/schapendixie88/Coder projects/codam/core/fly_in/src/reference/map.cpp",
-  "output": "CMakeFiles/fly_in.dir/src/reference/map.cpp.o"
+  "directory": "/home/brogaar/core/fly_in/cmake-build-debug",
+  "command": "/usr/bin/c++ -I/home/brogaar/core/fly_in/reference -I/home/brogaar/core/fly_in/raylib/include -g -std=gnu++17 -fcolor-diagnostics -o CMakeFiles/fly_in.dir/src/main.cpp.o -c /home/brogaar/core/fly_in/src/main.cpp",
+  "file": "/home/brogaar/core/fly_in/src/main.cpp",
+  "output": "/home/brogaar/core/fly_in/cmake-build-debug/CMakeFiles/fly_in.dir/src/main.cpp.o"
 },
 {
-  "directory": "/home/schapendixie88/Coder projects/codam/core/fly_in/cmake-build-debug",
-  "command": "/usr/bin/c++  -I\"/home/schapendixie88/Coder projects/codam/core/fly_in/reference\" -g -fdiagnostics-color=always -o CMakeFiles/fly_in.dir/src/reference/drone.cpp.o -c \"/home/schapendixie88/Coder projects/codam/core/fly_in/src/reference/drone.cpp\"",
-  "file": "/home/schapendixie88/Coder projects/codam/core/fly_in/src/reference/drone.cpp",
-  "output": "CMakeFiles/fly_in.dir/src/reference/drone.cpp.o"
+  "directory": "/home/brogaar/core/fly_in/cmake-build-debug",
+  "command": "/usr/bin/c++ -I/home/brogaar/core/fly_in/reference -I/home/brogaar/core/fly_in/raylib/include -g -std=gnu++17 -fcolor-diagnostics -o CMakeFiles/fly_in.dir/src/reference/connection.cpp.o -c /home/brogaar/core/fly_in/src/reference/connection.cpp",
+  "file": "/home/brogaar/core/fly_in/src/reference/connection.cpp",
+  "output": "/home/brogaar/core/fly_in/cmake-build-debug/CMakeFiles/fly_in.dir/src/reference/connection.cpp.o"
 },
 {
-  "directory": "/home/schapendixie88/Coder projects/codam/core/fly_in/cmake-build-debug",
-  "command": "/usr/bin/c++  -I\"/home/schapendixie88/Coder projects/codam/core/fly_in/reference\" -g -fdiagnostics-color=always -o CMakeFiles/fly_in.dir/src/reference/hub.cpp.o -c \"/home/schapendixie88/Coder projects/codam/core/fly_in/src/reference/hub.cpp\"",
-  "file": "/home/schapendixie88/Coder projects/codam/core/fly_in/src/reference/hub.cpp",
-  "output": "CMakeFiles/fly_in.dir/src/reference/hub.cpp.o"
+  "directory": "/home/brogaar/core/fly_in/cmake-build-debug",
+  "command": "/usr/bin/c++ -I/home/brogaar/core/fly_in/reference -I/home/brogaar/core/fly_in/raylib/include -g -std=gnu++17 -fcolor-diagnostics -o CMakeFiles/fly_in.dir/src/reference/drone.cpp.o -c /home/brogaar/core/fly_in/src/reference/drone.cpp",
+  "file": "/home/brogaar/core/fly_in/src/reference/drone.cpp",
+  "output": "/home/brogaar/core/fly_in/cmake-build-debug/CMakeFiles/fly_in.dir/src/reference/drone.cpp.o"
 },
 {
-  "directory": "/home/schapendixie88/Coder projects/codam/core/fly_in/cmake-build-debug",
-  "command": "/usr/bin/c++  -I\"/home/schapendixie88/Coder projects/codam/core/fly_in/reference\" -g -fdiagnostics-color=always -o CMakeFiles/fly_in.dir/src/reference/system.cpp.o -c \"/home/schapendixie88/Coder projects/codam/core/fly_in/src/reference/system.cpp\"",
-  "file": "/home/schapendixie88/Coder projects/codam/core/fly_in/src/reference/system.cpp",
-  "output": "CMakeFiles/fly_in.dir/src/reference/system.cpp.o"
+  "directory": "/home/brogaar/core/fly_in/cmake-build-debug",
+  "command": "/usr/bin/c++ -I/home/brogaar/core/fly_in/reference -I/home/brogaar/core/fly_in/raylib/include -g -std=gnu++17 -fcolor-diagnostics -o CMakeFiles/fly_in.dir/src/reference/hub.cpp.o -c /home/brogaar/core/fly_in/src/reference/hub.cpp",
+  "file": "/home/brogaar/core/fly_in/src/reference/hub.cpp",
+  "output": "/home/brogaar/core/fly_in/cmake-build-debug/CMakeFiles/fly_in.dir/src/reference/hub.cpp.o"
 },
 {
-  "directory": "/home/schapendixie88/Coder projects/codam/core/fly_in/cmake-build-debug",
-  "command": "/usr/bin/c++  -I\"/home/schapendixie88/Coder projects/codam/core/fly_in/reference\" -g -fdiagnostics-color=always -o CMakeFiles/fly_in.dir/src/utils.cpp.o -c \"/home/schapendixie88/Coder projects/codam/core/fly_in/src/utils.cpp\"",
-  "file": "/home/schapendixie88/Coder projects/codam/core/fly_in/src/utils.cpp",
-  "output": "CMakeFiles/fly_in.dir/src/utils.cpp.o"
+  "directory": "/home/brogaar/core/fly_in/cmake-build-debug",
+  "command": "/usr/bin/c++ -I/home/brogaar/core/fly_in/reference -I/home/brogaar/core/fly_in/raylib/include -g -std=gnu++17 -fcolor-diagnostics -o CMakeFiles/fly_in.dir/src/reference/map.cpp.o -c /home/brogaar/core/fly_in/src/reference/map.cpp",
+  "file": "/home/brogaar/core/fly_in/src/reference/map.cpp",
+  "output": "/home/brogaar/core/fly_in/cmake-build-debug/CMakeFiles/fly_in.dir/src/reference/map.cpp.o"
 },
 {
-  "directory": "/home/schapendixie88/Coder projects/codam/core/fly_in/cmake-build-debug",
-  "command": "/usr/bin/c++  -I\"/home/schapendixie88/Coder projects/codam/core/fly_in/reference\" -g -fdiagnostics-color=always -o CMakeFiles/fly_in.dir/src/reference/connection.cpp.o -c \"/home/schapendixie88/Coder projects/codam/core/fly_in/src/reference/connection.cpp\"",
-  "file": "/home/schapendixie88/Coder projects/codam/core/fly_in/src/reference/connection.cpp",
-  "output": "CMakeFiles/fly_in.dir/src/reference/connection.cpp.o"
+  "directory": "/home/brogaar/core/fly_in/cmake-build-debug",
+  "command": "/usr/bin/c++ -I/home/brogaar/core/fly_in/reference -I/home/brogaar/core/fly_in/raylib/include -g -std=gnu++17 -fcolor-diagnostics -o CMakeFiles/fly_in.dir/src/reference/system.cpp.o -c /home/brogaar/core/fly_in/src/reference/system.cpp",
+  "file": "/home/brogaar/core/fly_in/src/reference/system.cpp",
+  "output": "/home/brogaar/core/fly_in/cmake-build-debug/CMakeFiles/fly_in.dir/src/reference/system.cpp.o"
+},
+{
+  "directory": "/home/brogaar/core/fly_in/cmake-build-debug",
+  "command": "/usr/bin/c++ -I/home/brogaar/core/fly_in/reference -I/home/brogaar/core/fly_in/raylib/include -g -std=gnu++17 -fcolor-diagnostics -o CMakeFiles/fly_in.dir/src/reference/validator.cpp.o -c /home/brogaar/core/fly_in/src/reference/validator.cpp",
+  "file": "/home/brogaar/core/fly_in/src/reference/validator.cpp",
+  "output": "/home/brogaar/core/fly_in/cmake-build-debug/CMakeFiles/fly_in.dir/src/reference/validator.cpp.o"
+},
+{
+  "directory": "/home/brogaar/core/fly_in/cmake-build-debug",
+  "command": "/usr/bin/c++ -I/home/brogaar/core/fly_in/reference -I/home/brogaar/core/fly_in/raylib/include -g -std=gnu++17 -fcolor-diagnostics -o CMakeFiles/fly_in.dir/src/utils.cpp.o -c /home/brogaar/core/fly_in/src/utils.cpp",
+  "file": "/home/brogaar/core/fly_in/src/utils.cpp",
+  "output": "/home/brogaar/core/fly_in/cmake-build-debug/CMakeFiles/fly_in.dir/src/utils.cpp.o"
 }
 ]
