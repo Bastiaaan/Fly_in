@@ -9,6 +9,7 @@ class Drone {
 	public:
 		int id;
 		Drone(int id);
+		~Drone() = default;
 };
 
 #endif

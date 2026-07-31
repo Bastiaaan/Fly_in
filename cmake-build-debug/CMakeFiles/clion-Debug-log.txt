@@ -1,4 +1,0 @@
-/sgoinfre/brogaar/clion/bin/cmake/linux/x64/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/sgoinfre/brogaar/clion/bin/ninja/linux/x64/ninja -G Ninja -S /home/brogaar/core/fly_in -B /home/brogaar/core/fly_in/cmake-build-debug
--- Configuring done (0.0s)
--- Generating done (0.0s)
--- Build files have been written to: /home/brogaar/core/fly_in/cmake-build-debug

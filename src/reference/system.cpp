@@ -78,13 +78,13 @@ ExecuteState System::Load(std::string const &level, std::string const &difficult
             while (getline(_mapped, buffer))
             {
                 line++;
-                ExecuteState res = this->validator->saveRec(buffer, line);
-                if (!res.success)
-                    throw std::logic_error(std::any_cast<string>(res.why));
                 if (!buffer.empty())
                 {
                     if (buffer[0] != '#')
                     {
+                        ExecuteState res = this->validator->saveRec(buffer, line);
+                        if (!res.success)
+                            throw std::logic_error(std::any_cast<string>(res.why));
                         vector<string> keyRow = split(buffer, ':');
                         if (keyRow.size() != 2) {
                             _mapped.close();
@@ -128,10 +128,13 @@ ExecuteState System::Load(std::string const &level, std::string const &difficult
                             }
                             if (opened_meta != 0)
                                 throw std::logic_error("Incorrect meta enclosure found");
-                            Hub _hub = Factory<Hub>::create(args);
+                            auto _hub = new Hub(Factory<Hub>::create(args));
                             if (key == "start_hub")
-                                _hub.start = true;
-                            this->_map.addHub(&_hub);
+                                _hub->setStartOrEnd("start");
+                            else if (key == "end_hub")
+                                _hub->setStartOrEnd("end");
+                            this->_map.addHub(_hub);
+
                         }
                         else if(key == "connection")
                         {
@@ -143,25 +146,14 @@ ExecuteState System::Load(std::string const &level, std::string const &difficult
                             vector<string> hubs = split(values[0], '-');
                             if (hubs.size() != 2)
                                 throw logic_error("Invalid connection definition detected");
-                            Map map = this->_map;
-                            auto getByHubName = [&map](std::string const &hubName) -> Hub*
-                            {
-                                for (auto const h : map.hubs)
-                                {
-                                    if (h->name == hubName)
-                                        return h;
-                                }
-                                return nullptr;
-                            };
-
-                            if (getByHubName(hubs[0]) == nullptr)
+                            if (this->_map.getHub(hubs[0]) == nullptr)
                                 throw range_error("First hub is not found");
-                            if (getByHubName(hubs[1]) == nullptr)
+                            if (this->_map.getHub(hubs[1]) == nullptr)
                                 throw range_error("Second hub is not found");
                             int hub1 = Factory<Connection>::resolveKey("hub1", args);
                             int hub2 = Factory<Connection>::resolveKey("hub2", args);
-                            args[hub1].value = getByHubName(hubs[0]);
-                            args[hub2].value = getByHubName(hubs[1]);
+                            args[hub1].value = this->_map.getHub(hubs[0]);
+                            args[hub2].value = this->_map.getHub(hubs[1]);
                             if (values.size() == 2)
                             {
                                 if (values[1].find('[') != string::npos &&
@@ -179,33 +171,35 @@ ExecuteState System::Load(std::string const &level, std::string const &difficult
                                          values[1].find(']') == string::npos)
                                     throw std::logic_error("Custom brackets enclosed incorrectly");
                             }
-                            int iMap = Factory<Connection>::resolveKey("map", args);
-                            args[iMap].value = this->_map;
-                            auto connection = Factory<Connection>::create(args);
+                            auto connection = new Connection(Factory<Connection>::create(args));
                             this->_map.addConnection(connection);
-                            ExecuteState connect_result = connection.validate_connection(this->_map);
+                            ExecuteState connect_result = connection->validate_connection(this->_map);
                             if (!connect_result.success)
-                                throw std::logic_error("Invalid connection found");
+                                throw ParseException(connect_result.why.value());
                         }
                         else if(key == "nb_drones")
+                        {
+                            if (!stoi(row))
+                                throw ParseException("nb_drones must contain a numeric value.");
                             this->nb_drones = stoi(row);
+                        }
                         else
-                            throw std::logic_error("Unknown config key found.");
+                            throw ParseException("Unknown config key found.");
                     }
                 }
             }
             _mapped.close();
             return ExecuteState::Ok("Ok");
         }
-        catch (std::exception &ex)
-        {
-            _mapped.close();
-            return ExecuteState::Fail(ex.what(), line);
-        }
         catch (ParseException &pex)
         {
             _mapped.close();
             return ExecuteState::Fail(pex.what());
+        }
+        catch (std::exception &ex)
+        {
+            _mapped.close();
+            return ExecuteState::Fail(ex.what(), line);
         }
     }
     return mapResult;

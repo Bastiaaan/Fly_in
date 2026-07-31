@@ -4,7 +4,7 @@
 
 #include "../../reference/fly_in.hpp"
 
-Drone::Drone(int id)
+Drone::Drone(int const id)
 {
     this->id = id;
 }

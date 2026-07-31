@@ -25,8 +25,8 @@ ExecuteState Connection::validate_connection(Map &map) const
     {
         for (auto const &conn : map.connections)
         {
-            if (conn.hub1->name == hub1->name &&
-                conn.hub2->name == hub2->name)
+            if (conn->hub1->name == hub1->name &&
+                conn->hub2->name == hub2->name)
                 return true;
         }
         return false;

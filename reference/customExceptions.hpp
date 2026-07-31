@@ -27,3 +27,11 @@ class AlgoException : public std::exception
             return "Error while handling drones: " + this->errMsg;
         }
 };
+
+class StateException : public std::exception
+{
+    private:
+        std::string errTemplate;
+    public:
+        StateException(std::string const &msg) : errTemplate(msg) {}
+};

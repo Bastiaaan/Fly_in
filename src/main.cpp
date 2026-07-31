@@ -6,7 +6,7 @@ using namespace std;
 
 int main()
 {
-    System system;
+    System system = System();
     string difficulty;
     int input;
     cout << "============ Choose a difficulty ============" << endl;
@@ -51,6 +51,9 @@ int main()
             cout << "Error while parsing: " << result.why.value() << " at line " << result.line.value() << endl;
     }
     else
+    {
         cout << "parsing successful, let's Fly-In the drones!" << endl;
+        auto algoResult = fly_in(system);
+    }
 	return 0;
 };

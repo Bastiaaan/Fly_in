@@ -1,3 +1,0 @@
-/home/brogaar/core/fly_in/cmake-build-debug/CMakeFiles/fly_in.dir
-/home/brogaar/core/fly_in/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/brogaar/core/fly_in/cmake-build-debug/CMakeFiles/rebuild_cache.dir

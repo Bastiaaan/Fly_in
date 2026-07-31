@@ -36,6 +36,14 @@ struct ExecuteState
 	}
 };
 
+struct Option
+{
+	std::string difficulty;
+	std::string name;
+	int level;
+	
+};
+
 class System
 {
 	private:
@@ -49,7 +57,8 @@ class System
         int nb_drones;
 		std::string mapSrc;
         Map _map;
-        Validator* validator;
+        Validator *validator;
+		ExecuteState registerTurn();
         ExecuteState Load(std::string const &level, std::string const &difficulty);
         vector<tuple<int, string, string>> get_options(const std::string &difficulty);
         static void verboseFree(ExecuteState const &ex);
