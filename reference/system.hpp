@@ -45,7 +45,9 @@ struct Option
 
 struct Log
 {
-
+	Drone &drone;
+	Hub &hub;
+	std::string output;
 };
 
 class System
