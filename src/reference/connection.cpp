@@ -19,6 +19,11 @@ void Connection::setMlc(optional<int> max_link_capacity)
     this->max_link_capacity = max_link_capacity;
 }
 
+void Connection::establish() const
+{
+    this->hub1->connected = this->hub2;
+}
+
 ExecuteState Connection::validate_connection(Map &map) const
 {
     auto realConnection = [&map](Hub const *hub1, Hub const *hub2) -> bool
@@ -35,6 +40,7 @@ ExecuteState Connection::validate_connection(Map &map) const
     {
         if (!realConnection(this->hub1, this->hub2))
             throw std::logic_error("Connection not found");
+        this->establish();
         return ExecuteState::Ok("Connection established");
     }
     catch (std::exception &ex)

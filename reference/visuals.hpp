@@ -5,29 +5,38 @@
 
 struct Line
 {
+    int pos_x, pos_y;
     int startx;
     int starty;
     int endx;
     int endy;
-    static Line Save(int sx, int sy, int ex, int ey) {
-        Line _new;
-        _new.startx = sx;
-        _new.starty = sy;
-        _new.endx = ex;
-        _new.endy = ey;
-        return _new;
+    std::string type;
+    static Line Save(int sx, int sy, int ex, int ey, int x = -1, int y = 0, std::string const &type = "") {
+        auto result = Line();
+        if (x != -1)
+            result.pos_x = x;
+        if (type == "horizontal" || type == "vertical")
+            result.type = type;
+        result.pos_y = y;
+        result.startx = sx;
+        result.starty = sy;
+        result.endx = ex;
+        result.endy = ey;
+        return result;
     }
 };
 
 struct MeasureBank
 {
-    int monitorID;
-    int screenWidth;
-    int screenHeight;
-    int actionRadius_x;
-    int actionRadius_y;
-    int hubRangeX;
-    int hubRangeY;
+    unsigned long monitorID;
+    unsigned long screenWidth;
+    unsigned long screenHeight;
+    unsigned long startActionRadius_x;
+    unsigned long startActionRadius_y;
+    unsigned long endActionRadius_x;
+    unsigned long endActionRadius_y;
+    std::vector<int> hubRangeX;
+    std::vector<int> hubRangeY;
     std::vector<Line> lines;
     static MeasureBank Init(Map &map)
     {
@@ -37,32 +46,34 @@ struct MeasureBank
         std::cout << "monitor_id is: " << monitor << std::endl;
         bank.screenWidth = (GetMonitorWidth(monitor) / 100) * 75;
         bank.screenHeight = (GetMonitorHeight(monitor) / 100) * 80;
-
-        auto coordRange =  [map](char const c) -> int
+        std::cout << "Screen width: " << bank.screenWidth << std::endl;
+        std::cout << "Screen height: " << bank.screenHeight << std::endl;
+        auto _range = [&map](char const c) -> std::vector<int>
         {
+            std::vector<int> result;
+
             if (c == 'x' || c == 'y')
             {
-                int max = 0, min = 0;
-                for (int x = 0; x < map.hubs.size(); x++)
+                for (auto& hub : map.hubs)
                 {
-                    const int current = (c == 'x')
-                        ? map.hubs[x]->position_x
-                        : map.hubs[x]->position_y;
-                    if (current > max)
-                        max = current;
-                    if (current < min)
-                        min = current;
+                    int coord = c == 'x' ? hub->position_x : hub->position_y;
+                    if (std::find(result.begin(), result.end(), coord) == result.end())
+                        result.push_back(coord);
                 }
-                if (min < 0)
-                    min *= -1;
-                return (max - min) + 1;
+                if (c == 'y' && std::any_of(result.begin(), result.end(), [](int const n){ return n < 0; }))
+                    std::sort(result.begin(), result.end(), std::greater<int>{});
+                else
+                    std::sort(result.begin(), result.end());
             }
-            return -1;
+            return result;
         };
-        bank.actionRadius_x = bank.screenWidth - (bank.screenWidth / 15);
-        bank.actionRadius_y = bank.screenHeight - (bank.screenHeight / 15);
-        bank.hubRangeX = coordRange('x');
-        bank.hubRangeY = coordRange('y');
+        bank.startActionRadius_x = bank.screenWidth / 20;
+        bank.startActionRadius_y = bank.screenHeight / 20;
+        bank.endActionRadius_x = bank.screenWidth - bank.startActionRadius_x;
+        bank.endActionRadius_y = bank.screenHeight - bank.startActionRadius_y;
+        bank.hubRangeX = _range('x');
+        bank.hubRangeY = _range('y'); // each of them are incremented by two to get the right amount of lines for correct representation.
+        std::cout << "horizontal lines expected: " << bank.hubRangeY.size() << std::endl;
         return bank;
     }
     void saveLine(Line const &line)
@@ -73,5 +84,16 @@ struct MeasureBank
 
 struct HubPoint
 {
-    unsigned int x, y;
+    Hub &hub;
+    unsigned long x, y;
+    static HubPoint Save(Hub& hub, unsigned long x, unsigned long y) {
+        return { hub, x, y };
+    }
+};
+
+class Visualizer {
+    public:
+        static HubPoint locateHub(Hub &hub, std::vector<Line> const &lines);
+        static Color resolveColor(Hub &hub);
+        static void connectHubs();
 };

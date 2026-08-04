@@ -52,6 +52,8 @@ int main()
     }
     else
     {
+        system._map.setName(get<1>(options[chosenMap - 1]));
+        system._map.difficulty = difficulty;
         cout << "parsing successful, let's Fly-In the drones!" << endl;
         auto algoResult = fly_in(system);
     }

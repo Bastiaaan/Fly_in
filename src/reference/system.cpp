@@ -58,9 +58,22 @@ ExecuteState System::mapsBasePath()
     }
 }
 
+const Hub &System::findByCoordinates(int const x, const int y)
+{
+    auto hub = [this](int x, int y) -> Hub*
+    {
+        for (auto& h : this->_map.hubs)
+        {
+            if (h->position_x == x && h->position_y == y)
+                return h;
+        }
+        return nullptr;
+    };
+    return *hub(x, y);
+}
+
 ExecuteState System::Load(std::string const &level, std::string const &difficulty)
 {
-    cout << "Initializing Fly-in..." << endl;
     auto mapResult = mapsBasePath();
     if (mapResult.success)
     {
@@ -129,6 +142,8 @@ ExecuteState System::Load(std::string const &level, std::string const &difficult
                             if (opened_meta != 0)
                                 throw std::logic_error("Incorrect meta enclosure found");
                             auto _hub = new Hub(Factory<Hub>::create(args));
+                            if (_hub->position_x < 0)
+                                throw ParseException("first number cannot be negative");
                             if (key == "start_hub")
                                 _hub->setStartOrEnd("start");
                             else if (key == "end_hub")

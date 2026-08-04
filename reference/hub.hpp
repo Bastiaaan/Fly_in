@@ -13,9 +13,7 @@ enum Zone
 };
 
 class Hub {
-    std::optional<std::string> color;
     std::optional<int> max_drones;
-    std::optional<Zone> zone;
     bool start;
     bool end;
 	public:
@@ -24,7 +22,10 @@ class Hub {
 		std::string name;
 		int position_x;
 		int position_y;
+		std::optional<std::string> color;
         std::vector<Drone*> drones;
+		std::optional<Zone> zone;
+		Hub* connected;
         void setName(std::string name);
         void setX(int x);
         void setY(int y);
@@ -35,5 +36,6 @@ class Hub {
 		bool isStart() const;
 		bool isEnd() const;
         void dropInfo() const;
-
 };
+
+

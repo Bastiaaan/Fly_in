@@ -41,7 +41,11 @@ struct Option
 	std::string difficulty;
 	std::string name;
 	int level;
-	
+};
+
+struct Log
+{
+
 };
 
 class System
@@ -57,8 +61,10 @@ class System
         int nb_drones;
 		std::string mapSrc;
         Map _map;
+		std::vector<Log> logs;
         Validator *validator;
 		ExecuteState registerTurn();
+		const Hub& findByCoordinates(int x, int y);
         ExecuteState Load(std::string const &level, std::string const &difficulty);
         vector<tuple<int, string, string>> get_options(const std::string &difficulty);
         static void verboseFree(ExecuteState const &ex);

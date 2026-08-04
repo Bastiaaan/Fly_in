@@ -7,6 +7,7 @@ class Map;
 
 class Connection
 {
+    void establish() const;
     public:
         Hub *hub1;
         Hub *hub2;
