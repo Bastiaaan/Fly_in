@@ -21,7 +21,13 @@ void Connection::setMlc(optional<int> max_link_capacity)
 
 void Connection::establish() const
 {
-    this->hub1->connected = this->hub2;
+    Link connection;
+    connection.hub = hub2;
+    if (this->max_link_capacity.has_value())
+        connection.max_link_capacity = this->max_link_capacity.value();
+    else
+        connection.max_link_capacity = std::nullopt;
+    this->hub1->connections[this->hub2->name] = connection;
 }
 
 ExecuteState Connection::validate_connection(Map &map) const
@@ -45,48 +51,6 @@ ExecuteState Connection::validate_connection(Map &map) const
     }
     catch (std::exception &ex)
     {
-        return ExecuteState::Fail(ex.what());
-    }
-}
-
-ExecuteState Connection::drone_forward(Map &map) const
-{
-    try
-    {
-        auto valid = this->validate_connection(map);
-        if (!valid.success)
-            throw std::logic_error(valid.why.value());
-        Drone *_drone = this->hub1->drones.front();
-        if (_drone == nullptr)
-            throw std::logic_error("No drone to be moved");
-        this->hub2->drones.push_back(_drone);
-        this->hub1->drones.erase(this->hub1->drones.begin());
-        return ExecuteState::Ok("Moving drone");
-    }
-    catch (std::exception &ex)
-    {
-        std::cout << "OH OH: " << ex.what() << endl;
-        return ExecuteState::Fail(ex.what());
-    }
-}
-
-ExecuteState Connection::drone_backward(Map &map) const
-{
-    try
-    {
-        auto valid = this->validate_connection(map);
-        if (!valid.success)
-            throw std::logic_error(valid.why.value());
-        Drone *_drone = this->hub2->drones.front();
-        if (_drone == nullptr)
-            throw std::logic_error("No drone to be moved");
-        this->hub1->drones.push_back(_drone);
-        this->hub2->drones.erase(this->hub2->drones.begin());
-        return ExecuteState::Ok("Moving drone");
-    }
-    catch (std::exception &ex)
-    {
-        std::cout << "OH OH: " << ex.what() << endl;
         return ExecuteState::Fail(ex.what());
     }
 }

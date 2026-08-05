@@ -1,6 +1,8 @@
 
 #pragma once
 #include "fly_in.hpp"
+#include "map.hpp"
+#include "./hub.hpp"
 #include <raylib.h>
 
 struct Line
@@ -54,7 +56,7 @@ struct MeasureBank
 
             if (c == 'x' || c == 'y')
             {
-                for (auto& hub : map.hubs)
+                for (auto const *hub : map.hubs)
                 {
                     int coord = c == 'x' ? hub->position_x : hub->position_y;
                     if (std::find(result.begin(), result.end(), coord) == result.end())
@@ -73,7 +75,6 @@ struct MeasureBank
         bank.endActionRadius_y = bank.screenHeight - bank.startActionRadius_y;
         bank.hubRangeX = _range('x');
         bank.hubRangeY = _range('y'); // each of them are incremented by two to get the right amount of lines for correct representation.
-        std::cout << "horizontal lines expected: " << bank.hubRangeY.size() << std::endl;
         return bank;
     }
     void saveLine(Line const &line)
@@ -82,18 +83,11 @@ struct MeasureBank
     }
 };
 
-struct HubPoint
-{
-    Hub &hub;
-    unsigned long x, y;
-    static HubPoint Save(Hub& hub, unsigned long x, unsigned long y) {
-        return { hub, x, y };
-    }
-};
-
-class Visualizer {
+class Renderer {
     public:
-        static HubPoint locateHub(Hub &hub, std::vector<Line> const &lines);
+        static HubPoint* locateHub(Hub &hub, std::vector<Line> const &lines);
         static Color resolveColor(Hub &hub);
-        static void connectHubs();
+        static void renderCanvas(System &sys);
+        static void renderHubs(System &sys);
+        static void renderConnections(System &sys);
 };

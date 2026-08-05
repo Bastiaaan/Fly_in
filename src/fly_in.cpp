@@ -42,10 +42,9 @@ ExecuteState fly_in(System &sys)
             DrawLine(sizes.startActionRadius_x, sizes.startActionRadius_y, sizes.startActionRadius_x, sizes.endActionRadius_y, DARKGRAY);
             DrawLine(sizes.startActionRadius_x, sizes.endActionRadius_y, sizes.endActionRadius_x, sizes.endActionRadius_y, DARKGRAY);
             DrawText(TextFormat("Map: %s", sys._map.name.c_str()), sizes.screenWidth / 3 + 230, 20, 50, BLACK);
-            //DrawText(TextFormat("Turns taken: %d", sys.turn), 20, 85, 30, DARKGRAY);
 
-            unsigned long const total_x_radius = sizes.screenWidth;// - sizes.startActionRadius_x;
-            unsigned long const total_y_radius = sizes.screenHeight;// endActionRadius_y - sizes.startActionRadius_y;
+            unsigned long const total_x_radius = sizes.screenWidth;
+            unsigned long const total_y_radius = sizes.screenHeight;
             unsigned long const step_y = total_y_radius / (sizes.hubRangeY.size() + 1);
             unsigned long incr_y = step_y;
 
@@ -72,7 +71,6 @@ ExecuteState fly_in(System &sys)
                     incr_x += step_x;
                 }
                 checkList["vertical_lines"] = true;
-
                 auto horr_line = Line::Save(0,                  // x: left of screen
                                             incr_y,             // y: current row
                                             sizes.screenWidth,  // x: right of screen
@@ -94,50 +92,74 @@ ExecuteState fly_in(System &sys)
                 incr_y += step_y;
             }
             checkList["horizontal_lines"] = true;
-            //if (!checkList["matching_crossing_pixels"])
-            //{
+
             for (auto hub : sys._map.hubs)
             {
-                auto hubLoc = Visualizer::locateHub(*hub, sizes.lines);
+                auto hubLoc = Renderer::locateHub(*hub, sizes.lines);
                 float radius = 90;
-                if (sys._map.difficulty == "easy") radius = 90;
-                if (sys._map.difficulty == "medium") radius = 70;
-                if (sys._map.difficulty == "hard") radius = 50;
-                if (sys._map.difficulty == "challenger") radius = 30;
-                if (hubLoc.x > 0 && hubLoc.y > 0)
+                int fontSize = 25;
+                if (sys._map.difficulty == "easy") radius = 90, fontSize = 50;
+                if (sys._map.difficulty == "medium") radius = 70, fontSize = 40;
+                if (sys._map.difficulty == "hard") radius = 50, fontSize = 20;
+                if (sys._map.difficulty == "challenger") radius = 30, fontSize = 15;
+                if (hubLoc->x > 0 && hubLoc->y > 0)
                 {
                     if (hub->zone.has_value())
                     {
-                        if (hub->zone.value() == Zone::Blocked)
+                        if (hub->zone.value() == Blocked)
                         {
-                            DrawPoly({static_cast<float>(hubLoc.x), static_cast<float>(hubLoc.y)},
-                                      4, radius + 3, 45.0f, BLACK);
-                            DrawPoly({static_cast<float>(hubLoc.x), static_cast<float>(hubLoc.y)},
-                                      4, radius, 45.0f, Visualizer::resolveColor(*hub));
-                        }
-                        else if (hub->zone.value() == Zone::Restricted)
-                        {
-                            DrawPoly({static_cast<float>(hubLoc.x), static_cast<float>(hubLoc.y)},
-                                      6, radius + 3, 0.0f, BLACK);
-                            DrawPoly({static_cast<float>(hubLoc.x), static_cast<float>(hubLoc.y)},
-                                      6, radius, 0.0f, Visualizer::resolveColor(*hub));
-                        }
-                        else if (hub->zone.value() == Zone::Priority)
-                        {
-                            DrawPoly({static_cast<float>(hubLoc.x), static_cast<float>(hubLoc.y)},
+                            DrawPoly({static_cast<float>(hubLoc->x), static_cast<float>(hubLoc->y)},
                                       4, radius + 3, 0.0f, BLACK);
-                            DrawPoly({static_cast<float>(hubLoc.x), static_cast<float>(hubLoc.y)},
-                                      4, radius, 0.0f, Visualizer::resolveColor(*hub));
+                            DrawPoly({static_cast<float>(hubLoc->x), static_cast<float>(hubLoc->y)},
+                                      4, radius, 0.0f, Renderer::resolveColor(*hub));
                         }
-                        else if (hub->zone.value() == Zone::Normal)
+                        if (hub->zone.value() == Restricted)
                         {
-                            DrawCircle(hubLoc.x, hubLoc.y, radius + 3, BLACK);
-                            DrawCircle(hubLoc.x, hubLoc.y, radius, Visualizer::resolveColor(*hub));
+                            radius += 5;
+                            DrawPoly({static_cast<float>(hubLoc->x), static_cast<float>(hubLoc->y)},
+                                      6, radius + 3, 0.0f, BLACK);
+                            DrawPoly({static_cast<float>(hubLoc->x), static_cast<float>(hubLoc->y)},
+                                      6, radius, 0.0f, Renderer::resolveColor(*hub));
+                        }
+                        if (hub->zone.value() == Priority)
+                        {
+                            radius += 10;
+                            DrawPoly({static_cast<float>(hubLoc->x), static_cast<float>(hubLoc->y)},
+                                      3, radius + 3, 90.0f, BLACK);
+                            DrawPoly({static_cast<float>(hubLoc->x), static_cast<float>(hubLoc->y)},
+                                      3, radius, 90.0f, Renderer::resolveColor(*hub));
+                        }
+                        if (hub->zone.value() == Normal)
+                        {
+                            DrawCircle(hubLoc->x, hubLoc->y, radius + 3, BLACK);
+                            DrawCircle(hubLoc->x, hubLoc->y, radius, Renderer::resolveColor(*hub));
                         }
                     }
-                    DrawText(TextFormat("%s", hub->name.c_str()), hubLoc.x - (radius / 2), hubLoc.y + radius, 30, BLACK);
+                    int textWidth = MeasureText(hub->name.c_str(), fontSize);
+                    DrawText(TextFormat("%s", hub->name.c_str()), hubLoc->x - (textWidth / 2), hubLoc->y + (radius + 5), fontSize, BLACK);
+                    hub->location = hubLoc;
                 }
             }
+            for (auto hub : sys._map.hubs)
+            {
+                if (hub->connections.size() > 1)
+                {
+                    for (auto pair : hub->connections)
+                    {
+                        std::cout << "current hub's x-location: " << hub->location->x << std::endl;
+                        std::cout << "next hub's x-location: " << pair.second.hub->location->x << std::endl;
+                    }
+                }
+                else if (hub->connections.size() == 1)
+                {
+                    auto linked = hub->connections.begin();
+                    std::string nextName = linked->first;
+                    DrawLineEx({static_cast<float>(hub->location->x), static_cast<float>(hub->location->y)},
+                               {static_cast<float>(linked->second.hub->location->x), static_cast<float>(linked->second.hub->location->y)},
+                               10.0f, BLACK);
+                }
+            }
+            DrawRectangle(120, 20, 1501, 15, WHITE);
             //}
             //checkList["matching_crossing_pixels"] = true;
             EndDrawing();

@@ -2,7 +2,7 @@
 
 #include "visuals.hpp"
 
-HubPoint Visualizer::locateHub(Hub &hub, std::vector<Line> const &lines)
+HubPoint* Renderer::locateHub(Hub &hub, std::vector<Line> const &lines)
 {
     std::vector<Line> match;
     back_insert_iterator<vector<Line>> points = std::copy_if(lines.begin(), lines.end(), std::back_inserter(match),
@@ -37,16 +37,16 @@ HubPoint Visualizer::locateHub(Hub &hub, std::vector<Line> const &lines)
         return HubPoint::Save(hub, _line.startx, vert.starty);
 
     }
-    return {hub, 0, 0};
+    return new HubPoint {hub, 0, 0};
 }
 
-Color Visualizer::resolveColor(Hub &hub) {
+Color Renderer::resolveColor(Hub &hub) {
     if (!hub.color.has_value())
         return {128, 128, 128, 255};
 
     std::string const c = hub.color.value();
 
-    if      (c == "green")   return {0,   128, 0,   255};
+    if (c == "green")   return {0,   128, 0,   255};
     if (c == "red")     return {255, 0,   0,   255};
     if (c == "purple")  return {128, 0,   128, 255};
     if (c == "black")   return {0,   0,   0,   255};

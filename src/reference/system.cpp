@@ -204,6 +204,11 @@ ExecuteState System::Load(std::string const &level, std::string const &difficult
                 }
             }
             _mapped.close();
+            for (auto &con : this->_map.connections)
+            {
+                delete con;
+                con = nullptr;
+            }
             return ExecuteState::Ok("Ok");
         }
         catch (ParseException &pex)

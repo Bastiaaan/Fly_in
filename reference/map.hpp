@@ -1,29 +1,27 @@
-
 # pragma once
+
+#include "hub.hpp"
+
 class Connection;
-# include "connection.hpp"
-# include "hub.hpp"
 
-
-using namespace std;
 
 class Map {
-    string srcPath;
+    std::string srcPath;
 	public:
-        string name;
-        string difficulty;
-        vector<Hub*> hubs;
-        vector<Connection*> connections;
-		vector<Drone*> available_drones;
+        std::string name;
+        std::string difficulty;
+        std::vector<Hub*> hubs;
+        std::vector<Connection*> connections;
+		std::vector<Drone*> available_drones;
         void addHub(Hub* hub);
         void addConnection(Connection* connection);
-        void setName(string &name);
-        void setDifficulty(string &difficulty);
-        void setSrcPath(string &path);
-		Hub* getHub(string const &hubName);
+        void setName(std::string &name);
+        void setDifficulty(std::string &difficulty);
+        void setSrcPath(std::string &path);
+		Hub* getHub(std::string const &hubName);
         Map() = default;
-	    Map(string &name,
-            string &srcPath,
-            string &difficulty);
+	    Map(std::string &name,
+            std::string &srcPath,
+            std::string &difficulty);
 	    ~Map();
 };

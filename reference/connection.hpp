@@ -18,6 +18,4 @@ class Connection
         void setHub2(Hub *hub2);
         void setMlc(optional<int> max_link_capacity);
         ExecuteState validate_connection(Map &map) const;
-        ExecuteState drone_forward(Map &map) const;
-        ExecuteState drone_backward(Map &map) const;
 };

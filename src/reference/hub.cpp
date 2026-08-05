@@ -5,7 +5,7 @@
 #include "fly_in.hpp"
 #include "customExceptions.hpp"
 
-void Hub::setName(string name)
+void Hub::setName(std::string const &name)
 {
     this->name = name;
 }
@@ -22,14 +22,19 @@ void Hub::setY(int y)
 
 void Hub::setZone(optional<string> const &zoneName)
 {
-    if (zoneName == "restricted")
-        this->zone = Zone::Restricted;
-    if (zoneName == "blocked")
-        this->zone = Zone::Blocked;
-    if (zoneName ==  "priority")
-        this->zone = Zone::Priority;
-    else
-        this->zone = Zone::Normal;
+    if (zoneName.has_value())
+    {
+        std::cout << "Registered zone: " << zoneName.value() << std::endl;
+        if (zoneName.value() == "restricted")
+            this->zone = Zone::Restricted;
+        else if (zoneName.value() == "blocked")
+            this->zone = Zone::Blocked;
+        else if (zoneName.value() ==  "priority")
+            this->zone = Zone::Priority;
+        else
+            this->zone = Zone::Normal;
+        std::cout << "this zone has id: " << this->zone.value() << std::endl;
+    }
 }
 
 void Hub::setColor(optional<string> const &color)

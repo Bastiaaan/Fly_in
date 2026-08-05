@@ -2,6 +2,8 @@
 #pragma once
 # include "drone.hpp"
 
+struct HubPoint;
+struct Link;
 class Connection;
 
 enum Zone
@@ -13,20 +15,21 @@ enum Zone
 };
 
 class Hub {
-    std::optional<int> max_drones;
-    bool start;
-    bool end;
 	public:
 		Hub() = default;
 		~Hub() = default;
+		std::optional<int> max_drones;
+		bool start;
+		bool end;
 		std::string name;
 		int position_x;
 		int position_y;
 		std::optional<std::string> color;
         std::vector<Drone*> drones;
 		std::optional<Zone> zone;
-		Hub* connected;
-        void setName(std::string name);
+		std::map<std::string, Link> connections;
+		HubPoint *location;
+        void setName(std::string const &name);
         void setX(int x);
         void setY(int y);
         void setZone(std::optional<std::string> const &zoneName);
@@ -38,4 +41,17 @@ class Hub {
         void dropInfo() const;
 };
 
+struct HubPoint
+{
+	Hub &hub;
+	unsigned long x, y;
+	static HubPoint* Save(Hub& hub, unsigned long x, unsigned long y) {
+		return new HubPoint { hub, x, y };
+	}
+};
 
+struct Link
+{
+	Hub *hub;
+	std::optional<int> max_link_capacity;
+};
