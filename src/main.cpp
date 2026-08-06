@@ -54,13 +54,7 @@ int main()
     {
         system._map.setName(get<1>(options[chosenMap - 1]));
         system._map.difficulty = difficulty;
-        std::cout << "parsing successful, let's Fly-In the drones!" << endl;
-
-        std::cout << "But first checking out some hubs and their connections!" << std::endl;
-        for (auto _hub : system._map.hubs)
-        {
-            std::cout << "Hub #" << _hub->name << " contains " << _hub->connections.size() << " connections" << std::endl;
-        }
+        system.initDrones();
         auto algoResult = fly_in(system);
     }
 	return 0;

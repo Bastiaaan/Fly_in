@@ -1,4 +1,6 @@
 
+#include <cmath>
+#include <set>
 
 #include "visuals.hpp"
 
@@ -48,6 +50,7 @@ Color Renderer::resolveColor(Hub &hub) {
 
     if (c == "green")   return {0,   128, 0,   255};
     if (c == "red")     return {255, 0,   0,   255};
+    if (c == "cyan")    return {0, 255, 255, 255};
     if (c == "purple")  return {128, 0,   128, 255};
     if (c == "black")   return {0,   0,   0,   255};
     if (c == "brown")   return {165, 42,  42,  255};
@@ -60,4 +63,194 @@ Color Renderer::resolveColor(Hub &hub) {
     if (c == "yellow")  return {255, 255, 0,   255};
     if (c == "blue")    return {0,   0,   255, 255};
     return {128, 128, 128, 255};
+}
+
+std::pair<std::pair<int, int>, std::pair<int, int>> Renderer::cutExcessPixels(Hub* origin, Link next)
+{
+    HubPoint *currentLoc = origin->location;
+    HubPoint *nextLoc = next.hub->location;
+
+}
+
+void Renderer::renderBackground(System &sys, MeasureBank &sizes)
+{
+    ClearBackground(RAYWHITE);
+    DrawRectangle(0, 0, sizes.screenWidth, sizes.startActionRadius_y, LIGHTGRAY);
+    DrawRectangle(0, 0, sizes.startActionRadius_x, sizes.screenHeight, LIGHTGRAY);
+    DrawRectangle(0, sizes.endActionRadius_y, sizes.screenWidth, sizes.startActionRadius_y, LIGHTGRAY);
+    DrawRectangle(sizes.endActionRadius_x, 0, sizes.screenWidth, sizes.endActionRadius_x, LIGHTGRAY);
+    DrawLine(sizes.endActionRadius_x, sizes.startActionRadius_y, sizes.endActionRadius_x, sizes.endActionRadius_y, DARKGRAY);
+    DrawLine(sizes.startActionRadius_x, sizes.startActionRadius_y, sizes.endActionRadius_x, sizes.startActionRadius_y, DARKGRAY);
+    DrawLine(sizes.startActionRadius_x, sizes.startActionRadius_y, sizes.startActionRadius_x, sizes.endActionRadius_y, DARKGRAY);
+    DrawLine(sizes.startActionRadius_x, sizes.endActionRadius_y, sizes.endActionRadius_x, sizes.endActionRadius_y, DARKGRAY);
+    DrawText(TextFormat("Map: %s", sys._map.name.c_str()), sizes.screenWidth / 3 + 230, 20, 50, BLACK);
+}
+
+void Renderer::renderBackgroundLines(System &sys, MeasureBank &sizes, map<string, bool> &checkList)
+{
+    unsigned long const total_x_radius = sizes.screenWidth;
+    unsigned long const total_y_radius = sizes.screenHeight;
+    unsigned long const step_y = total_y_radius / (sizes.hubRangeY.size() + 1);
+    unsigned long incr_y = step_y;
+
+    for (int ytem : sizes.hubRangeY)
+    {
+        unsigned long const step_x = total_x_radius / (sizes.hubRangeX.size() + 1);
+        unsigned long incr_x = step_x;
+
+        for (int xtem : sizes.hubRangeX)
+        {
+            auto vert_line = Line::Save(incr_x,        // x: start from 0 offset
+                                        0,              // y: top of screen
+                                        incr_x,         // x: same column
+                                        sizes.screenHeight, // y: bottom of screen
+                                      xtem,
+                                      ytem,
+                                 "vertical");
+            DrawLine(vert_line.startx, vert_line.starty,
+                             vert_line.endx,   vert_line.endy, LIGHTGRAY);
+            if (!checkList["vertical_lines"])
+                sizes.saveLine(vert_line);
+            incr_x += step_x;
+        }
+        checkList["vertical_lines"] = true;
+        auto horr_line = Line::Save(0,                  // x: left of screen
+                                    incr_y,             // y: current row
+                                    sizes.screenWidth,  // x: right of screen
+                                    incr_y,             // y: same row
+                                  -1,
+                                  ytem,
+                             "horizontal");
+        DrawLine(horr_line.startx, horr_line.starty,
+                         horr_line.endx,horr_line.endy, LIGHTGRAY);
+
+        for (int i = 0; i <= sizes.hubRangeX.size(); i++)
+        {
+            horr_line.pos_x = i;
+            if (!checkList["horizontal_lines"])
+                sizes.saveLine(horr_line);
+        }
+        incr_y += step_y;
+    }
+    checkList["horizontal_lines"] = true;
+}
+
+void Renderer::renderHubs(System &sys, MeasureBank const &sizes)
+{
+    for (auto hub : sys._map.hubs)
+    {
+        auto hubLoc = Renderer::locateHub(*hub, sizes.lines);
+        hub->location = hubLoc;
+
+        float radius = 90;
+        int fontSize = 25;
+        if (sys._map.difficulty == "easy") radius = (sizes.screenWidth / 31), fontSize = 50;
+        if (sys._map.difficulty == "medium") radius = (sizes.screenWidth / 34), fontSize = 40;
+        if (sys._map.difficulty == "hard") radius = (sizes.screenWidth / 52), fontSize = 20;
+        if (sys._map.difficulty == "challenger") radius = (sizes.screenWidth / 70), fontSize = 15;
+        if (hubLoc->x > 0 && hubLoc->y > 0)
+        {
+            if (hub->zone.has_value())
+            {
+                if (hub->zone.value() == Blocked)
+                {
+                    DrawPoly({static_cast<float>(hubLoc->x), static_cast<float>(hubLoc->y)},
+                                      4, radius + 3, 0.0f, BLACK);
+                    DrawPoly({static_cast<float>(hubLoc->x), static_cast<float>(hubLoc->y)},
+                                      4, radius, 0.0f, Renderer::resolveColor(*hub));
+                }
+                if (hub->zone.value() == Restricted)
+                {
+                    radius += 5;
+                    DrawPoly({static_cast<float>(hubLoc->x), static_cast<float>(hubLoc->y)},
+                                      6, radius + 3, 0.0f, BLACK);
+                    DrawPoly({static_cast<float>(hubLoc->x), static_cast<float>(hubLoc->y)},
+                                      6, radius, 0.0f, Renderer::resolveColor(*hub));
+                }
+                if (hub->zone.value() == Priority)
+                {
+                    radius += 10;
+                    DrawPoly({static_cast<float>(hubLoc->x), static_cast<float>(hubLoc->y)},
+                                      3, radius + 3, 90.0f, BLACK);
+                    DrawPoly({static_cast<float>(hubLoc->x), static_cast<float>(hubLoc->y)},
+                                      3, radius, 90.0f, Renderer::resolveColor(*hub));
+                }
+                if (hub->zone.value() == Normal)
+                {
+                    DrawCircle(hubLoc->x, hubLoc->y, radius + 3, BLACK);
+                    DrawCircle(hubLoc->x, hubLoc->y, radius, Renderer::resolveColor(*hub));
+                }
+            }
+            int textWidth = MeasureText(hub->name.c_str(), fontSize);
+            DrawText(TextFormat("%s", hub->name.c_str()), hubLoc->x - (textWidth / 2), hubLoc->y + (radius + 5), fontSize, BLACK);
+        }
+    }
+}
+
+void Renderer::renderConnections(System &sys, MeasureBank const &sizes)
+{
+    for (auto *hub : sys._map.hubs)
+    {
+        if (hub->location == nullptr)
+        {
+            auto hubLoc = locateHub(*hub, sizes.lines);
+            hub->location = hubLoc;
+        }
+    }
+
+    std::set<std::pair<std::string, std::string>> drawnConnections;
+
+    for (auto const *hub : sys._map.hubs)
+    {
+        for (auto const &pair : hub->connections)
+        {
+            auto subjected = pair.second;
+
+            std::string a = hub->name, b = subjected.hub->name;
+            auto key = (a < b) ? std::make_pair(a, b) : std::make_pair(b, a);
+            if (drawnConnections.count(key)) continue;
+            drawnConnections.insert(key);
+
+            Vector2 start = {static_cast<float>(hub->location->x),           static_cast<float>(hub->location->y)};
+            Vector2 end   = {static_cast<float>(subjected.hub->location->x), static_cast<float>(subjected.hub->location->y)};
+
+            float dx = end.x - start.x;
+            float dy = end.y - start.y;
+            float length = std::sqrt(dx * dx + dy * dy);
+            float nx = dx / length;
+            float ny = dy / length;
+            float px = -ny;
+            float py =  nx;
+
+            float arrowSize = 12.0f;
+            float spacing   = 20.0f;
+            float step      = arrowSize + spacing;
+            int   count     = static_cast<int>(length / step);
+
+            for (int i = 0; i < count; i++)
+            {
+                float t = (i * step) + spacing;
+
+                Vector2 tip   = {start.x + nx * (t + arrowSize), start.y + ny * (t + arrowSize)};
+                Vector2 left  = {start.x + nx * t + px * arrowSize, start.y + ny * t + py * arrowSize};
+                Vector2 right = {start.x + nx * t - px * arrowSize, start.y + ny * t - py * arrowSize};
+
+                DrawTriangle(left, tip, right, DARKGRAY);
+            }
+        }
+    }
+}
+
+void Renderer::renderDrones(System &sys, MeasureBank const &sizes)
+{
+    for (auto hub : sys._map.hubs)
+    {
+        for (auto drone : hub->drones)
+        {
+            //float randSeedX =
+            if (drone->location == nullptr) {
+                drone->location = new Vector2 { static_cast<float>(hub->location->x), static_cast<float>(hub->location->y)};
+            }
+        }
+    }
 }

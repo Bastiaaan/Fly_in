@@ -5,6 +5,15 @@
 #include "fly_in.hpp"
 #include "customExceptions.hpp"
 
+Hub::~Hub()
+{
+    if (!this->drones.empty())
+    {
+        for (auto const drone : this->drones)
+            delete[] drone;
+    }
+}
+
 void Hub::setName(std::string const &name)
 {
     this->name = name;

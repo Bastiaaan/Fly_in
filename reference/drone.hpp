@@ -1,15 +1,11 @@
-
-#ifndef DRONE_HPP
-# define DRONE_HPP
-
-#include "fly_in.hpp"
 #pragma once
+
+#include "raylib.h"
 
 class Drone {
 	public:
+		Vector2 *location;
 		int id;
 		Drone(int id);
-		~Drone() = default;
+		~Drone();
 };
-
-#endif

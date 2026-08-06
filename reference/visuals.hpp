@@ -37,6 +37,7 @@ struct MeasureBank
     unsigned long startActionRadius_y;
     unsigned long endActionRadius_x;
     unsigned long endActionRadius_y;
+    Vector2 hubRadius;
     std::vector<int> hubRangeX;
     std::vector<int> hubRangeY;
     std::vector<Line> lines;
@@ -46,8 +47,8 @@ struct MeasureBank
         MeasureBank bank;
         bank.monitorID = monitor;
         std::cout << "monitor_id is: " << monitor << std::endl;
-        bank.screenWidth = (GetMonitorWidth(monitor) / 100) * 75;
-        bank.screenHeight = (GetMonitorHeight(monitor) / 100) * 80;
+        bank.screenWidth = (GetMonitorWidth(monitor) / 100) * 90;
+        bank.screenHeight = (GetMonitorHeight(monitor) / 100) * 85;
         std::cout << "Screen width: " << bank.screenWidth << std::endl;
         std::cout << "Screen height: " << bank.screenHeight << std::endl;
         auto _range = [&map](char const c) -> std::vector<int>
@@ -69,8 +70,8 @@ struct MeasureBank
             }
             return result;
         };
-        bank.startActionRadius_x = bank.screenWidth / 20;
-        bank.startActionRadius_y = bank.screenHeight / 20;
+        bank.startActionRadius_x = bank.screenWidth / 40;
+        bank.startActionRadius_y = bank.screenHeight / 27;
         bank.endActionRadius_x = bank.screenWidth - bank.startActionRadius_x;
         bank.endActionRadius_y = bank.screenHeight - bank.startActionRadius_y;
         bank.hubRangeX = _range('x');
@@ -81,13 +82,20 @@ struct MeasureBank
     {
         this->lines.push_back(line);
     }
+    void storeHubRadius(Vector2 const radius)
+    {
+        this->hubRadius = radius;
+    }
 };
 
 class Renderer {
     public:
         static HubPoint* locateHub(Hub &hub, std::vector<Line> const &lines);
         static Color resolveColor(Hub &hub);
-        static void renderCanvas(System &sys);
-        static void renderHubs(System &sys);
-        static void renderConnections(System &sys);
+        static std::pair<std::pair<int, int>, std::pair<int, int>> cutExcessPixels(Hub *origin, Link next);
+        static void renderBackground(System &sys, MeasureBank &sizes);
+        static void renderBackgroundLines(System &sys, MeasureBank &sizes, map<string, bool> &checkList);
+        static void renderHubs(System &sys, MeasureBank const &sizes);
+        static void renderConnections(System &sys, MeasureBank const &sizes);
+        static void renderDrones(System &sys, MeasureBank const &sizes);
 };

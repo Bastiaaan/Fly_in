@@ -17,7 +17,7 @@ enum Zone
 class Hub {
 	public:
 		Hub() = default;
-		~Hub() = default;
+		~Hub();
 		std::optional<int> max_drones;
 		bool start;
 		bool end;

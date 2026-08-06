@@ -6,6 +6,7 @@
 #include <iostream>
 #include <map>
 #include <optional>
+#include <random>
 #include <regex>
 #include <sstream>
 #include <string>
@@ -24,6 +25,7 @@
 #include "validator.hpp"
 #include "system.hpp"
 
+static std::mt19937 rng(std::random_device{}());
 
 vector<string> split(const string &s, char delimiter, unsigned int size = 0);
 string join(const vector<string>& parts, char delimiter, unsigned int size = 0);

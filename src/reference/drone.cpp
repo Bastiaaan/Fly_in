@@ -8,3 +8,9 @@ Drone::Drone(int const id)
 {
     this->id = id;
 }
+
+Drone::~Drone()
+{
+    if (this->location != nullptr)
+        delete this->location;
+}

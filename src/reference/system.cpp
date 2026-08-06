@@ -4,7 +4,7 @@
 
 #include <any>
 #include <optional>
-#include "../../reference/fly_in.hpp"
+#include "fly_in.hpp"
 #include "factory.tpp"
 
 using namespace std;
@@ -22,7 +22,8 @@ System::System()
 
 System::~System()
 {
-    cout << endl << "== shutting down ==" << endl;
+    cout << endl << "==== shutting down ====" << endl;
+    delete this->validator;
 }
 
 void System::verboseFree(ExecuteState const &ex)
@@ -223,6 +224,26 @@ ExecuteState System::Load(std::string const &level, std::string const &difficult
         }
     }
     return mapResult;
+}
+
+ExecuteState System::initDrones()
+{
+    try
+    {
+        Hub *start = this->_map.hubs.front();
+        if (start == nullptr)
+            throw logic_error("Start hub was not found");
+        for (int id = 0; id < this->nb_drones; id++)
+        {
+            auto *drone = new Drone(id + 1);
+            start->drones.push_back(drone);
+        }
+        return ExecuteState::Ok("drones installed");
+    }
+    catch (std::exception &ex)
+    {
+        return ExecuteState::Fail(ex.what());
+    }
 }
 
 vector<tuple<int, string, string>> System::get_options(const std::string &difficulty)
