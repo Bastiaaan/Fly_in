@@ -1,17 +1,11 @@
 #pragma once
 
 #include <filesystem>
-#include <fstream>
-#include <functional>
 #include <iostream>
-#include <map>
-#include <optional>
 #include <random>
 #include <regex>
-#include <sstream>
+#include <optional>
 #include <string>
-#include <tuple>
-#include <type_traits>
 #include <variant>
 #include <vector>
 
@@ -20,14 +14,14 @@
 #include "drone.hpp"
 #include "hub.hpp"
 #include "factory.hpp"
-#include "system.hpp"
 #include "map.hpp"
 #include "validator.hpp"
 #include "system.hpp"
 
 static std::mt19937 rng(std::random_device{}());
+struct ExecuteState;
+class System;
 
-vector<string> split(const string &s, char delimiter, unsigned int size = 0);
-string join(const vector<string>& parts, char delimiter, unsigned int size = 0);
+std::vector<std::string> split(const std::string &s, char delimiter, unsigned int size = 0);
+std::string join(const std::vector<std::string>& parts, char delimiter, unsigned int size = 0);
 ExecuteState fly_in(System &sys);
-

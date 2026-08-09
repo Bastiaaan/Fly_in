@@ -4,6 +4,8 @@
 
 #include <any>
 #include <optional>
+#include <iostream>
+#include <fstream>
 #include "fly_in.hpp"
 #include "factory.tpp"
 
@@ -59,6 +61,12 @@ ExecuteState System::mapsBasePath()
     }
 }
 
+ExecuteState System::registerTurn()
+{
+    this->turn++;
+    return ExecuteState::Ok(1);
+}
+
 const Hub &System::findByCoordinates(int const x, const int y)
 {
     auto hub = [this](int x, int y) -> Hub*
@@ -82,14 +90,14 @@ ExecuteState System::Load(std::string const &level, std::string const &difficult
         auto result = mapResult.result;
         string const &base = any_cast<string>(result);
         string const target = base + difficulty + '/' + level;
-        ifstream _mapped(target);
+        std::ifstream _mapped(target);
         if (!_mapped.is_open())
             return ExecuteState::Fail("Could not open map '" + target + "'", 0);
         vector<Connection> collectedConnections;
         try
         {
-            string buffer;
-            while (getline(_mapped, buffer))
+            std::string buffer;
+            while (std::getline(_mapped, buffer))
             {
                 line++;
                 if (!buffer.empty())
@@ -246,7 +254,7 @@ ExecuteState System::initDrones()
     }
 }
 
-vector<tuple<int, string, string>> System::get_options(const std::string &difficulty)
+vector<tuple<int, string, string>> System::get_options(std::string const &difficulty)
 {
     cout << "choosing out of options..." << endl;
     vector<tuple<int, string, string>> options; // <level, display_name, file>

@@ -1,8 +1,10 @@
 #pragma once
-#include "hub.hpp"
-#include "system.hpp"
+# include "hub.hpp"
+# include "fly_in.hpp"
+# include "system.hpp"
 
 struct ExecuteState;
+class Hub;
 class Map;
 
 class Connection
@@ -16,6 +18,6 @@ class Connection
         ~Connection() = default;
         void setHub1(Hub *hub1);
         void setHub2(Hub *hub2);
-        void setMlc(optional<int> max_link_capacity);
+        void setMlc(std::optional<int> max_link_capacity);
         ExecuteState validate_connection(Map &map) const;
 };

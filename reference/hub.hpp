@@ -1,6 +1,7 @@
 
 #pragma once
 # include "drone.hpp"
+# include "fly_in.hpp"
 
 struct HubPoint;
 struct Link;
@@ -16,7 +17,7 @@ enum Zone
 
 class Hub {
 	public:
-		Hub() = default;
+		Hub();
 		~Hub();
 		std::optional<int> max_drones;
 		bool start;

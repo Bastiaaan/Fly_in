@@ -1,12 +1,10 @@
-#ifndef FACTORY_HPP
-# define FACTORY_HPP
-#include "fly_in.hpp"
 #pragma once
+# include "fly_in.hpp"
 
 struct Argument
 {
-    string key;
-    variant<int, optional<int>, bool, std::string, optional<string>, char, double, Hub*, Map> value;
+    std::string key;
+    std::variant<int, std::optional<int>, bool, std::string, std::optional<std::string>, char, double, Hub*> value;
     Argument& operator=(Argument &&n) {
         key = move(n.key);
         value = move(n.value);
@@ -22,5 +20,3 @@ class Factory
         static std::map<int, Argument> ready_args();
         static int resolveKey(std::string const &key, std::map<int, Argument> &args);
 };
-
-#endif

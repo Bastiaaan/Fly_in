@@ -66,6 +66,7 @@ class System
 		std::vector<Log> logs;
         Validator *validator;
 		ExecuteState initDrones();
+		ExecuteState rotateDrone();
 		ExecuteState registerTurn();
 		const Hub& findByCoordinates(int x, int y);
         ExecuteState Load(std::string const &level, std::string const &difficulty);

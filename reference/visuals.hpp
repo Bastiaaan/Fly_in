@@ -1,8 +1,6 @@
 
 #pragma once
 #include "fly_in.hpp"
-#include "map.hpp"
-#include "./hub.hpp"
 #include <raylib.h>
 
 struct Line
@@ -46,11 +44,8 @@ struct MeasureBank
         int const monitor = GetCurrentMonitor();
         MeasureBank bank;
         bank.monitorID = monitor;
-        std::cout << "monitor_id is: " << monitor << std::endl;
         bank.screenWidth = (GetMonitorWidth(monitor) / 100) * 90;
         bank.screenHeight = (GetMonitorHeight(monitor) / 100) * 85;
-        std::cout << "Screen width: " << bank.screenWidth << std::endl;
-        std::cout << "Screen height: " << bank.screenHeight << std::endl;
         auto _range = [&map](char const c) -> std::vector<int>
         {
             std::vector<int> result;
@@ -95,7 +90,7 @@ class Renderer {
         static std::pair<std::pair<int, int>, std::pair<int, int>> cutExcessPixels(Hub *origin, Link next);
         static void renderBackground(System &sys, MeasureBank &sizes);
         static void renderBackgroundLines(System &sys, MeasureBank &sizes, map<string, bool> &checkList);
-        static void renderHubs(System &sys, MeasureBank const &sizes);
+        static void renderHubs(System &sys, MeasureBank &sizes);
         static void renderConnections(System &sys, MeasureBank const &sizes);
         static void renderDrones(System &sys, MeasureBank const &sizes);
 };

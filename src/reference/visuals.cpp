@@ -18,8 +18,11 @@ HubPoint* Renderer::locateHub(Hub &hub, std::vector<Line> const &lines)
         Line hor = match[1];
         if (vert.type == "vertical" && hor.type == "horizontal")
         {
-            while (vert.starty != hor.starty && hor.startx != vert.startx)
-                vert.starty++, hor.startx++;
+            while (vert.starty != hor.starty || hor.startx != vert.startx)
+            {
+                if (vert.starty != hor.starty) vert.starty++;
+                if (hor.startx != vert.startx) hor.startx++;
+            }
             return HubPoint::Save(hub, vert.startx, hor.starty);
         }
     }
@@ -42,7 +45,8 @@ HubPoint* Renderer::locateHub(Hub &hub, std::vector<Line> const &lines)
     return new HubPoint {hub, 0, 0};
 }
 
-Color Renderer::resolveColor(Hub &hub) {
+Color Renderer::resolveColor(Hub &hub)
+{
     if (!hub.color.has_value())
         return {128, 128, 128, 255};
 
@@ -65,12 +69,11 @@ Color Renderer::resolveColor(Hub &hub) {
     return {128, 128, 128, 255};
 }
 
-std::pair<std::pair<int, int>, std::pair<int, int>> Renderer::cutExcessPixels(Hub* origin, Link next)
-{
-    HubPoint *currentLoc = origin->location;
-    HubPoint *nextLoc = next.hub->location;
-
-}
+// std::pair<std::pair<int, int>, std::pair<int, int>> Renderer::cutExcessPixels(Hub* origin, Link next)
+// {
+//     HubPoint *currentLoc = origin->location;
+//     HubPoint *nextLoc = next.hub->location;
+// }
 
 void Renderer::renderBackground(System &sys, MeasureBank &sizes)
 {
@@ -135,19 +138,20 @@ void Renderer::renderBackgroundLines(System &sys, MeasureBank &sizes, map<string
     checkList["horizontal_lines"] = true;
 }
 
-void Renderer::renderHubs(System &sys, MeasureBank const &sizes)
+void Renderer::renderHubs(System &sys, MeasureBank &sizes)
 {
-    for (auto hub : sys._map.hubs)
+    for (auto const hub : sys._map.hubs)
     {
         auto hubLoc = Renderer::locateHub(*hub, sizes.lines);
         hub->location = hubLoc;
 
         float radius = 90;
         int fontSize = 25;
-        if (sys._map.difficulty == "easy") radius = (sizes.screenWidth / 31), fontSize = 50;
-        if (sys._map.difficulty == "medium") radius = (sizes.screenWidth / 34), fontSize = 40;
-        if (sys._map.difficulty == "hard") radius = (sizes.screenWidth / 52), fontSize = 20;
-        if (sys._map.difficulty == "challenger") radius = (sizes.screenWidth / 70), fontSize = 15;
+        if (sys._map.difficulty == "easy") radius = static_cast<float>(sizes.screenWidth / 31), fontSize = 50;
+        if (sys._map.difficulty == "medium") radius = static_cast<float>(sizes.screenWidth / 34), fontSize = 40;
+        if (sys._map.difficulty == "hard") radius = static_cast<float>(sizes.screenWidth / 55), fontSize = 20;
+        if (sys._map.difficulty == "challenger") radius = static_cast<float>(sizes.screenWidth / 70), fontSize = 15;
+        sizes.hubRadius.x = radius, sizes.hubRadius.y = radius;
         if (hubLoc->x > 0 && hubLoc->y > 0)
         {
             if (hub->zone.has_value())
@@ -198,59 +202,40 @@ void Renderer::renderConnections(System &sys, MeasureBank const &sizes)
         }
     }
 
-    std::set<std::pair<std::string, std::string>> drawnConnections;
-
     for (auto const *hub : sys._map.hubs)
     {
-        for (auto const &pair : hub->connections)
+        for (const auto &[fst, snd] : hub->connections)
         {
-            auto subjected = pair.second;
-
-            std::string a = hub->name, b = subjected.hub->name;
-            auto key = (a < b) ? std::make_pair(a, b) : std::make_pair(b, a);
-            if (drawnConnections.count(key)) continue;
-            drawnConnections.insert(key);
-
-            Vector2 start = {static_cast<float>(hub->location->x),           static_cast<float>(hub->location->y)};
-            Vector2 end   = {static_cast<float>(subjected.hub->location->x), static_cast<float>(subjected.hub->location->y)};
-
-            float dx = end.x - start.x;
-            float dy = end.y - start.y;
-            float length = std::sqrt(dx * dx + dy * dy);
-            float nx = dx / length;
-            float ny = dy / length;
-            float px = -ny;
-            float py =  nx;
-
-            float arrowSize = 12.0f;
-            float spacing   = 20.0f;
-            float step      = arrowSize + spacing;
-            int   count     = static_cast<int>(length / step);
-
-            for (int i = 0; i < count; i++)
-            {
-                float t = (i * step) + spacing;
-
-                Vector2 tip   = {start.x + nx * (t + arrowSize), start.y + ny * (t + arrowSize)};
-                Vector2 left  = {start.x + nx * t + px * arrowSize, start.y + ny * t + py * arrowSize};
-                Vector2 right = {start.x + nx * t - px * arrowSize, start.y + ny * t - py * arrowSize};
-
-                DrawTriangle(left, tip, right, DARKGRAY);
-            }
+            auto const linked = snd.hub;
+            Vector2 from = {static_cast<float>(hub->location->x), static_cast<float>(hub->location->y)};
+            Vector2 to   = {static_cast<float>(linked->location->x), static_cast<float>(linked->location->y)};
+            DrawLineEx(from, to, 5, GRAY);
         }
     }
 }
 
 void Renderer::renderDrones(System &sys, MeasureBank const &sizes)
 {
+    std::uniform_real_distribution angleDist(0.0f, 2.0f * static_cast<float>(M_PI));
+    std::uniform_real_distribution<float> radiusDist(0.0f, sizes.hubRadius.x);
+
     for (auto hub : sys._map.hubs)
     {
         for (auto drone : hub->drones)
         {
-            //float randSeedX =
-            if (drone->location == nullptr) {
-                drone->location = new Vector2 { static_cast<float>(hub->location->x), static_cast<float>(hub->location->y)};
+            if (drone->location == nullptr)
+            {
+                float angle  = angleDist(rng);
+                float radius = radiusDist(rng);
+                drone->location = new Vector2 {
+                    static_cast<float>(hub->location->x) + std::cos(angle) * radius,
+                    static_cast<float>(hub->location->y) + std::sin(angle) * radius
+                };
             }
+            DrawPoly((*drone->location), 4, 33, 90.0f, BLACK);
+            DrawPoly((*drone->location), 4, 30, 90.0f, GRAY);
+            int measureTxt = MeasureText(TextFormat("#%d", drone->id), 15);
+            DrawText(TextFormat("#%d", drone->id), drone->location->x - measureTxt, drone->location->y - measureTxt / 2, 20, BLACK);
         }
     }
 }

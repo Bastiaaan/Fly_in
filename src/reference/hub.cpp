@@ -5,6 +5,11 @@
 #include "fly_in.hpp"
 #include "customExceptions.hpp"
 
+Hub::Hub()
+{
+    this->location = nullptr;
+}
+
 Hub::~Hub()
 {
     if (!this->drones.empty())
@@ -19,12 +24,12 @@ void Hub::setName(std::string const &name)
     this->name = name;
 }
 
-void Hub::setX(int x)
+void Hub::setX(int const x)
 {
     this->position_x = x;
 }
 
-void Hub::setY(int y)
+void Hub::setY(int const y)
 {
     this->position_y = y;
 }
@@ -33,7 +38,6 @@ void Hub::setZone(optional<string> const &zoneName)
 {
     if (zoneName.has_value())
     {
-        std::cout << "Registered zone: " << zoneName.value() << std::endl;
         if (zoneName.value() == "restricted")
             this->zone = Zone::Restricted;
         else if (zoneName.value() == "blocked")
@@ -42,7 +46,6 @@ void Hub::setZone(optional<string> const &zoneName)
             this->zone = Zone::Priority;
         else
             this->zone = Zone::Normal;
-        std::cout << "this zone has id: " << this->zone.value() << std::endl;
     }
 }
 
@@ -88,14 +91,16 @@ bool Hub::isEnd() const
 
 void Hub::dropInfo() const
 {
-    std::cout << "Information about Hub #" << this->name << ':' << endl << endl;
-    std::cout << " -\tX: " << this->position_x << endl;
-    std::cout << " -\tY: " << this->position_y << endl;
+    std::cout << "Information about Hub #" << this->name << ':' << std::endl << std::endl;
+    std::cout << " -\tX: " << this->position_x << std::endl;
+    std::cout << " -\tY: " << this->position_y << std::endl;
     if (this->color.has_value())
-        std::cout << " -\tColor: " << this->color.value() << endl;
+        std::cout << " -\tColor: " << this->color.value() << std::endl;
     if (this->zone.has_value())
-        std::cout << " -\tZone: " << this->zone.value() << endl;
+        std::cout << " -\tZone: " << this->zone.value() << std::endl;
     if (this->max_drones.has_value())
-        std::cout << "- \tMax drones: " << this->max_drones.value() << endl;
+        std::cout << "- \tMax drones: " << this->max_drones.value() << std::endl;
+    if (!this->drones.empty())
+        std::cout << "- Amount of drones: " << this->drones.size() << std::endl;
     std::cout << endl;
 }

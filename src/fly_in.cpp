@@ -1,7 +1,8 @@
 
 #include <raylib.h>
-#include "fly_in.hpp"
 
+#include "algorithm.hpp"
+#include "fly_in.hpp"
 #include "visuals.hpp"
 
 ExecuteState fly_in(System &sys)
@@ -28,7 +29,6 @@ ExecuteState fly_in(System &sys)
         checkList.insert({"vertical_lines", false});
         checkList.insert({"horizontal_lines", false});
         checkList.insert({"connecting_hubs", false});
-        Vector2 drone = {0, static_cast<float>(sizes.screenHeight / 2)};
         while(!WindowShouldClose())
         {
             BeginDrawing();
@@ -37,9 +37,8 @@ ExecuteState fly_in(System &sys)
             Renderer::renderConnections(sys, sizes);
             Renderer::renderHubs(sys, sizes);
             Renderer::renderDrones(sys, sizes);
-            DrawPoly(drone, 4, 30, 45.0f, GRAY);
-            drone.x++;
-            WaitTime(0.00105);
+            //if (Algorithm::correctSettled(sys))
+            Algorithm::rotateDrones(sys, sizes.hubRadius.x);
             EndDrawing();
         }
         throw AlgoException("Oh oh, could not Fly-In the drones :(");
