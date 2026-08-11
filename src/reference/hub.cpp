@@ -8,6 +8,8 @@
 Hub::Hub()
 {
     this->location = nullptr;
+    this->start = false;
+    this->end = false;
 }
 
 Hub::~Hub()

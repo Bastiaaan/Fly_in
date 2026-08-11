@@ -10,6 +10,8 @@ class Algorithm
         static int rotateDrones(System const &sys, float hubRadius);
         static std::vector<Hub*> containingDrones(System const &sys);
         static void movingDrones(System const &sys);
-        static int calculateShortest(System &sys, Hub const *hub); // recursion may be applied here
+        static int searchForEnd(System &sys, Hub const *hub); // recursion may be applied here
+        static Link& cheapest(std::map<std::string, Link*> connections);
         static bool correctSettled(System const &sys);
+        static bool noDroneFlies(System const &sys);
 };

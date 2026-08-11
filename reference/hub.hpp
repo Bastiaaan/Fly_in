@@ -28,7 +28,7 @@ class Hub {
 		std::optional<std::string> color;
         std::vector<Drone*> drones;
 		std::optional<Zone> zone;
-		std::map<std::string, Link> connections;
+		std::map<std::string, Link*> connections;
 		HubPoint *location;
         void setName(std::string const &name);
         void setX(int x);

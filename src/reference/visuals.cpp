@@ -206,7 +206,7 @@ void Renderer::renderConnections(System &sys, MeasureBank const &sizes)
     {
         for (const auto &[fst, snd] : hub->connections)
         {
-            auto const linked = snd.hub;
+            auto const linked = snd->hub;
             Vector2 from = {static_cast<float>(hub->location->x), static_cast<float>(hub->location->y)};
             Vector2 to   = {static_cast<float>(linked->location->x), static_cast<float>(linked->location->y)};
             DrawLineEx(from, to, 5, GRAY);

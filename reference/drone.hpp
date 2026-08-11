@@ -12,4 +12,5 @@ class Drone {
 		~Drone();
 		int setDestination(Hub* destination, float hubRadius);
 		bool flying() const;
+		void moving();
 };

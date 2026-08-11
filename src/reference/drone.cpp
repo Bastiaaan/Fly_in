@@ -28,12 +28,41 @@ int Drone::setDestination(Hub* destination, float hubRadius)
     };
     if (destination->zone.value() == Restricted)
         return 2;
+    std::cout << "" << std::endl;
     return 1;
 }
 
-bool Drone::flying() const {
+bool Drone::flying() const
+{
     if (!this->destination.has_value())
         return false;
-    return this->location->x == this->destination.value()->x &&
-           this->location->y == this->destination.value()->y;
+    return this->location->x != this->destination.value()->x &&
+           this->location->y != this->destination.value()->y;
+}
+
+void Drone::moving()
+{
+    if (this->flying())
+    {
+        float speed = 175.0f;
+
+        float dx = this->destination.value()->x - this->location->x;
+        float dy = this->destination.value()->y - this->location->y;
+        float distance = std::sqrt(dx * dx + dy * dy);
+
+        if (distance < 1.0f)
+        {
+            delete this->destination.value();
+            this->destination.reset();
+        }
+        else
+        {
+            float step = std::min(speed * GetFrameTime(), distance);
+            float dirX = dx / distance;
+            float dirY = dy / distance;
+
+            this->location->x += dirX * step;
+            this->location->y += dirY * step;
+        }
+    }
 }

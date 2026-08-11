@@ -203,9 +203,12 @@ ExecuteState System::Load(std::string const &level, std::string const &difficult
                         }
                         else if(key == "nb_drones")
                         {
-                            if (!stoi(row))
+                            int value = stoi(row);
+                            if (!value)
                                 throw ParseException("nb_drones must contain a numeric value.");
-                            this->nb_drones = stoi(row);
+                            if (value <= 0)
+                                throw ParseException("nb_drones can never be negative or zero.");
+                            this->nb_drones = value;
                         }
                         else
                             throw ParseException("Unknown config key found.");
@@ -223,7 +226,7 @@ ExecuteState System::Load(std::string const &level, std::string const &difficult
         catch (ParseException &pex)
         {
             _mapped.close();
-            return ExecuteState::Fail(pex.what());
+            return ExecuteState::Fail(pex.what(), line);
         }
         catch (std::exception &ex)
         {
@@ -243,10 +246,11 @@ ExecuteState System::initDrones()
             throw logic_error("Start hub was not found");
         for (int id = 0; id < this->nb_drones; id++)
         {
+            std::cout << "Installing drone #" << id + 1 << std::endl;
             auto *drone = new Drone(id + 1);
             start->drones.push_back(drone);
         }
-        return ExecuteState::Ok("drones installed");
+        return ExecuteState::Ok(TextFormat("%d drones installed", this->nb_drones));
     }
     catch (std::exception &ex)
     {

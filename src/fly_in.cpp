@@ -37,8 +37,10 @@ ExecuteState fly_in(System &sys)
             Renderer::renderConnections(sys, sizes);
             Renderer::renderHubs(sys, sizes);
             Renderer::renderDrones(sys, sizes);
-            //if (Algorithm::correctSettled(sys))
-            Algorithm::rotateDrones(sys, sizes.hubRadius.x);
+            if (Algorithm::noDroneFlies(sys))
+                Algorithm::rotateDrones(sys, sizes.hubRadius.x);
+            else
+                Algorithm::movingDrones(sys);
             EndDrawing();
         }
         throw AlgoException("Oh oh, could not Fly-In the drones :(");
