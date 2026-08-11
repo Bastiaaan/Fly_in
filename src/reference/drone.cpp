@@ -44,7 +44,7 @@ void Drone::moving()
 {
     if (this->flying())
     {
-        float speed = 175.0f;
+        float speed = 350.0f;
 
         float dx = this->destination.value()->x - this->location->x;
         float dy = this->destination.value()->y - this->location->y;
