@@ -91,6 +91,21 @@ bool Hub::isEnd() const
     return this->end != false;
 }
 
+void Hub::transferDrone(Link &connection, float hubRadius)
+{
+    if (Algorithm::readyFly(connection))
+    {
+        unsigned int const limit = Algorithm::droneLimit(this, connection);
+        for (int _ = 0; _ < limit; _++)
+        {
+            Drone *drone = this->drones.front();
+            drone->setDestination(connection.hub, hubRadius);
+            this->drones.erase(this->drones.begin());
+            connection.hub->drones.push_back(drone);
+        }
+    }
+}
+
 void Hub::dropInfo() const
 {
     std::cout << "Information about Hub #" << this->name << ':' << std::endl << std::endl;

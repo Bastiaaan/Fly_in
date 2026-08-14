@@ -34,16 +34,31 @@ int Algorithm::rotateDrones(System const &sys, float const hubRadius)
     {
         if (!_hub->connections.empty())
         {
-            auto connection = _hub->connections.size() > 1 ? cheapestPossible(*_hub) : *_hub->connections.begin()->second;
-            if (readyFly(connection))
+            auto candidates = getConnectionCosts(*_hub);
+            if (!candidates.empty())
             {
-                unsigned int const limit = droneLimit(_hub, connection);
-                for (int _ = 0; _ < limit; _++)
+                std::cout << "Containing " << candidates.size() << " candidates" << std::endl;
+                if (std::all_of(candidates.begin(), candidates.end(), [firstCost = get<0>(candidates.begin()->second)]
+                    (std::pair<const std::string, std::tuple<float, Link *>> const &entry) -> bool
+                    { return firstCost == std::get<0>(entry.second); }) && candidates.size() > 1)
                 {
-                    Drone *drone = _hub->drones.front();
-                    drone->setDestination(connection->hub, hubRadius);
-                    _hub->drones.erase(_hub->drones.begin());
-                    connection->hub->drones.push_back(drone);
+                    for (auto [name, link] : candidates)
+                    {
+                        Link *connection = get<1>(link);
+                        _hub->transferDrone(*connection, hubRadius);
+                        turns += connection->hub->zone == Restricted ? 2 : 1;
+                    }
+                }
+                else
+                {
+                    auto cheapest = std::min_element(
+                    candidates.begin(), candidates.end(),
+                [](std::pair<const std::string, std::tuple<float, Link *>> const &a,
+                    std::pair<const std::string, std::tuple<float, Link *>> const &b)
+                    { return std::get<0>(a.second) < std::get<0>(b.second); });
+                    auto value = *get<1>(cheapest->second);
+                    _hub->transferDrone(value, hubRadius);
+                    turns += value.hub->zone == Restricted ? 2 : 1;
                 }
             }
         }
@@ -52,36 +67,49 @@ int Algorithm::rotateDrones(System const &sys, float const hubRadius)
     return turns;
 }
 
-bool Algorithm::foundTheEnd(Hub const &hub)
-// returning the necessary turns to take to reach that specific end and re-calculating the factors.
-{
-    bool search = false;
-    if (hub.connections.size() == 1)
-    {
-        auto [_hub, link] = *hub.connections.begin()->second;
-        search = foundTheEnd(*_hub);
-    }
-    else if (hub.connections.size() > 1)
-    {
-        // todo: Searching each option until there's an end.
-        for (auto [hub, link] : hub.connections)
-        {
-            search = foundTheEnd(*link->hub);
-        }
-    }
-    else
-    {
-        if (hub.isEnd())
-            search = true;
-        else
-            search = false;
-    }
-    return search;
+bool Algorithm::foundTheEnd(Hub const &origin, Hub const &hub) {
+    auto visited = new unordered_set<Hub const*>();
+    bool const result = foundTheEnd(origin, hub, visited);
+    delete visited;
+    visited = nullptr;
+    return result;
 }
 
-Link& Algorithm::cheapestPossible(Hub const &hub)
+bool Algorithm::foundTheEnd(
+    Hub const& origin,
+    Hub const& hub,
+    std::unordered_set<Hub const*>* visited)
 {
-    std::map<std::string, float> costs;
+    if (&hub == &origin)
+        return false;
+
+    // Circular trap
+    if (!visited->insert(&hub).second)
+        return false;
+
+    // We reached an end
+    if (hub.isEnd())
+        return true;
+
+    // No way forward
+    if (hub.connections.empty())
+        return false;
+
+    // Search all possible outgoing connections
+    for (auto const& [_, link] : hub.connections)
+    {
+        if (foundTheEnd(origin, *link->hub, visited))
+            return true;
+    }
+
+    return false;
+}
+
+std::map<std::string, std::tuple<float, Link *>> Algorithm::getConnectionCosts(Hub const &hub)
+{
+    std::map<std::string, std::tuple<float, Link *>> costs;
+    if (hub.connections.empty())
+        return costs;
     for (auto [_, connection] : hub.connections)
     {
         float totalCost = 0.0f;
@@ -111,21 +139,12 @@ Link& Algorithm::cheapestPossible(Hub const &hub)
             else
                 totalCost += static_cast<float>(hub.drones.size());
         }
-        if (!foundTheEnd(*connection->hub))
-            totalCost += 12.5;
-        costs.insert({_, totalCost / static_cast<float>(hub.drones.size())});
+        if (!foundTheEnd(hub, *connection->hub))
+             totalCost = INFINITY;
+        if (totalCost != INFINITY)
+            costs.insert({_, {totalCost / static_cast<float>(hub.drones.size()), connection}});
     }
-    auto result = std::min_element(
-        costs.begin(),
-        costs.end(),
-        [](auto const &a, auto const &b) { return a.second < b.second; });
-    if (result != costs.end())
-    {
-        std::string const& key = result->first;
-        float value = result->second;
-    }
-
-    return *hub.connections.find(result->first)->second;
+    return costs;
 }
 
 void Algorithm::movingDrones(System const &sys)
@@ -139,14 +158,33 @@ void Algorithm::movingDrones(System const &sys)
     std::cout << std::endl;
 }
 
-unsigned int Algorithm::droneLimit(Hub const &hub, Link const &connection)
+unsigned int Algorithm::droneLimit(Hub const *hub, Link const &connection)
 {
+    unsigned int drones = hub->drones.size();
+    unsigned int nextDrones = connection.hub->drones.size();
+
     if (connection.hub->max_drones.has_value() || connection.max_link_capacity.has_value())
     {
-        if (connection.hub->max_drones.has_value()) return connection.hub->max_drones.value();
-        if (connection.max_link_capacity.has_value()) return connection.max_link_capacity.value();
+        if (connection.hub->max_drones.has_value())
+        {
+            if (nextDrones != 0)
+            {
+                if (nextDrones == connection.hub->max_drones.value())
+                    return 0;
+                if (nextDrones < connection.hub->max_drones.value())
+                    return connection.hub->max_drones.value() - nextDrones;
+            }
+            else
+            {
+                return drones >= connection.hub->max_drones.value() ?
+                     connection.hub->max_drones.value() : drones;
+            }
+        }
+        if (connection.max_link_capacity.has_value())
+            return drones >= connection.max_link_capacity.value() ?
+            connection.max_link_capacity.value() : drones;
     }
-    return hub.drones.size();
+    return drones;
 }
 
 bool Algorithm::readyFly(Link const &connection)

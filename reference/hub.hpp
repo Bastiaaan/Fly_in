@@ -37,6 +37,7 @@ class Hub {
         void setColor(std::optional<std::string> const &color);
         void setMaxDrones(std::optional<int> max_drones);
 		void setStartOrEnd(std::string const &soe);
+		void transferDrone(Link &connection, float hubRadius);
 		bool isStart() const;
 		bool isEnd() const;
         void dropInfo() const;

@@ -1,14 +1,17 @@
 #pragma once
 
+#include <cmath>
 #include <filesystem>
 #include <iostream>
 #include <random>
 #include <regex>
 #include <optional>
 #include <string>
+#include <unordered_set>
 #include <variant>
 #include <vector>
 
+#include "algorithm.hpp"
 #include "customExceptions.hpp"
 #include "connection.hpp"
 #include "drone.hpp"

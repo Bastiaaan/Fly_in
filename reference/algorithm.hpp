@@ -10,9 +10,10 @@ class Algorithm
         static int rotateDrones(System const &sys, float hubRadius);
         static std::vector<Hub*> containingDrones(System const &sys);
         static void movingDrones(System const &sys);
-        static bool foundTheEnd(Hub const &hub); // recursion may be applied here
-        static Link& cheapestPossible(Hub const &hub);
+        static bool foundTheEnd(Hub const &origin, Hub const &hub);
+        static bool foundTheEnd(Hub const &origin, Hub const &hub, std::unordered_set<Hub const*>* visited); // recursion may be applied here
+        static std::map<std::string, std::tuple<float, Link *>> getConnectionCosts(Hub const &hub);
         static bool readyFly(Link const &connection);
-        static unsigned int droneLimit(Hub const *hub, Link const *connection);
+        static unsigned int droneLimit(Hub const *hub, Link const &connection);
         static bool noDroneFlies(System const &sys);
 };

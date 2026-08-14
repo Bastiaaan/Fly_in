@@ -66,6 +66,8 @@ Color Renderer::resolveColor(Hub &hub)
     if (c == "crimson") return {220, 20,  60,  255};
     if (c == "yellow")  return {255, 255, 0,   255};
     if (c == "blue")    return {0,   0,   255, 255};
+    if (c == "magenta") return {255, 0, 255, 255};
+    if (c == "lime")    return {0, 255, 0, 255};
     return {128, 128, 128, 255};
 }
 
