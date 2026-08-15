@@ -1,10 +1,12 @@
 
 #pragma once
 # include "drone.hpp"
+# include "system.hpp"
 # include "fly_in.hpp"
 
 struct HubPoint;
 struct Link;
+struct Log;
 class Connection;
 
 enum Zone
@@ -19,15 +21,15 @@ class Hub {
 	public:
 		Hub();
 		~Hub();
-		std::optional<int> max_drones;
+		int max_drones;
 		bool start;
 		bool end;
 		std::string name;
 		int position_x;
 		int position_y;
-		std::optional<std::string> color;
+		std::string color;
         std::vector<Drone*> drones;
-		std::optional<Zone> zone;
+		Zone zone;
 		std::map<std::string, Link*> connections;
 		HubPoint *location;
         void setName(std::string const &name);
@@ -37,10 +39,9 @@ class Hub {
         void setColor(std::optional<std::string> const &color);
         void setMaxDrones(std::optional<int> max_drones);
 		void setStartOrEnd(std::string const &soe);
-		void transferDrone(Link &connection, float hubRadius);
+		std::vector<Log*> transferDrone(Link &connection, float hubRadius);
 		bool isStart() const;
 		bool isEnd() const;
-        void dropInfo() const;
 };
 
 struct HubPoint
@@ -55,5 +56,5 @@ struct HubPoint
 struct Link
 {
 	Hub *hub;
-	std::optional<int> max_link_capacity;
+	int max_link_capacity;
 };

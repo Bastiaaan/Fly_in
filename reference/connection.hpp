@@ -13,7 +13,7 @@ class Connection
     public:
         Hub *hub1;
         Hub *hub2;
-        std::optional<int> max_link_capacity;
+        int max_link_capacity;
         Connection() = default;
         ~Connection() = default;
         void setHub1(Hub *hub1);

@@ -23,7 +23,12 @@ ExecuteState Validator::saveRec(string &buffer, unsigned int line)
 ValidationResult Validator::Execute() {
     try
     {
-        
+        FailureCause cause;
+        std::cout << "checking the rules of this wretched file;" << std::endl << std::endl;
+        for (auto [rule, record] : this->mapRows)
+        {
+            std::cout << TextFormat("rule #%d: -- %s --", rule, record.c_str()) << std::endl;
+        }
         return ValidationResult::Pass();
     }
     catch (ParseException &ex)

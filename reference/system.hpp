@@ -45,9 +45,17 @@ struct Option
 
 struct Log
 {
-	Drone &drone;
-	Hub &hub;
-	std::string output;
+	Drone const *drone;
+	Hub const *hub;
+	std::string _output;
+	static Log* output(Drone const &d, Hub const &h)
+	{
+		auto log = new Log();
+		log->drone = &d;
+		log->hub = &h;
+		log->_output = TextFormat("D%d-%s", d.id, h.name.c_str());
+		return log;
+	}
 };
 
 class System
@@ -63,10 +71,9 @@ class System
         int nb_drones;
 		std::string mapSrc;
         Map _map;
-		std::vector<Log> logs;
+		std::vector<Log*> logs;
         Validator *validator;
 		ExecuteState initDrones();
-		ExecuteState rotateDrone();
 		ExecuteState registerTurn();
 		const Hub& findByCoordinates(int x, int y);
         ExecuteState Load(std::string const &level, std::string const &difficulty);

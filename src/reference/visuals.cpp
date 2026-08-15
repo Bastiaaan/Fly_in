@@ -47,10 +47,10 @@ HubPoint* Renderer::locateHub(Hub &hub, std::vector<Line> const &lines)
 
 Color Renderer::resolveColor(Hub &hub)
 {
-    if (!hub.color.has_value())
+    if (hub.color == "default")
         return {128, 128, 128, 255};
 
-    std::string const c = hub.color.value();
+    std::string const c = hub.color;
 
     if (c == "green")   return {0,   128, 0,   255};
     if (c == "red")     return {255, 0,   0,   255};
@@ -156,36 +156,33 @@ void Renderer::renderHubs(System &sys, MeasureBank &sizes)
         sizes.hubRadius.x = radius, sizes.hubRadius.y = radius;
         if (hubLoc->x > 0 && hubLoc->y > 0)
         {
-            if (hub->zone.has_value())
+            if (hub->zone == Blocked)
             {
-                if (hub->zone.value() == Blocked)
-                {
-                    DrawPoly({static_cast<float>(hubLoc->x), static_cast<float>(hubLoc->y)},
-                                      4, radius + 3, 0.0f, BLACK);
-                    DrawPoly({static_cast<float>(hubLoc->x), static_cast<float>(hubLoc->y)},
-                                      4, radius, 0.0f, Renderer::resolveColor(*hub));
-                }
-                if (hub->zone.value() == Restricted)
-                {
-                    radius += 5;
-                    DrawPoly({static_cast<float>(hubLoc->x), static_cast<float>(hubLoc->y)},
-                                      6, radius + 3, 0.0f, BLACK);
-                    DrawPoly({static_cast<float>(hubLoc->x), static_cast<float>(hubLoc->y)},
-                                      6, radius, 0.0f, Renderer::resolveColor(*hub));
-                }
-                if (hub->zone.value() == Priority)
-                {
-                    radius += 10;
-                    DrawPoly({static_cast<float>(hubLoc->x), static_cast<float>(hubLoc->y)},
-                                      3, radius + 3, 90.0f, BLACK);
-                    DrawPoly({static_cast<float>(hubLoc->x), static_cast<float>(hubLoc->y)},
-                                      3, radius, 90.0f, Renderer::resolveColor(*hub));
-                }
-                if (hub->zone.value() == Normal)
-                {
-                    DrawCircle(hubLoc->x, hubLoc->y, radius + 3, BLACK);
-                    DrawCircle(hubLoc->x, hubLoc->y, radius, Renderer::resolveColor(*hub));
-                }
+                DrawPoly({static_cast<float>(hubLoc->x), static_cast<float>(hubLoc->y)},
+                                  4, radius + 3, 0.0f, BLACK);
+                DrawPoly({static_cast<float>(hubLoc->x), static_cast<float>(hubLoc->y)},
+                                  4, radius, 0.0f, Renderer::resolveColor(*hub));
+            }
+            if (hub->zone == Restricted)
+            {
+                radius += 5;
+                DrawPoly({static_cast<float>(hubLoc->x), static_cast<float>(hubLoc->y)},
+                                  6, radius + 3, 0.0f, BLACK);
+                DrawPoly({static_cast<float>(hubLoc->x), static_cast<float>(hubLoc->y)},
+                                  6, radius, 0.0f, Renderer::resolveColor(*hub));
+            }
+            if (hub->zone == Priority)
+            {
+                radius += 10;
+                DrawPoly({static_cast<float>(hubLoc->x), static_cast<float>(hubLoc->y)},
+                                  3, radius + 3, 90.0f, BLACK);
+                DrawPoly({static_cast<float>(hubLoc->x), static_cast<float>(hubLoc->y)},
+                                  3, radius, 90.0f, Renderer::resolveColor(*hub));
+            }
+            if (hub->zone == Normal)
+            {
+                DrawCircle(hubLoc->x, hubLoc->y, radius + 3, BLACK);
+                DrawCircle(hubLoc->x, hubLoc->y, radius, Renderer::resolveColor(*hub));
             }
             int textWidth = MeasureText(hub->name.c_str(), fontSize);
             DrawText(TextFormat("%s", hub->name.c_str()), hubLoc->x - (textWidth / 2), hubLoc->y + (radius + 5), fontSize, BLACK);

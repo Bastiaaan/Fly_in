@@ -13,10 +13,13 @@ Drone::Drone(int const id)
 Drone::~Drone()
 {
     if (this->location != nullptr)
+    {
         delete this->location;
+        this->location = nullptr;
+    }
 }
 
-int Drone::setDestination(Hub* destination, float hubRadius)
+int Drone::setDestination(Hub* const destination, float hubRadius)
 {
     std::uniform_real_distribution angleDist(0.0f, 2.0f * static_cast<float>(M_PI));
     std::uniform_real_distribution<float> radiusDist(0.0f, hubRadius);
@@ -26,9 +29,8 @@ int Drone::setDestination(Hub* destination, float hubRadius)
         static_cast<float>(destination->location->x) + std::cos(angle) * radius,
           static_cast<float>(destination->location->y) + std::sin(angle) * radius
     };
-    if (destination->zone.value() == Restricted)
+    if (destination->zone == Restricted)
         return 2;
-    std::cout << "" << std::endl;
     return 1;
 }
 

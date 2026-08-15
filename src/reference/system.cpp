@@ -20,6 +20,7 @@ System::System()
     this->turn = 0;
     this->_map = Map();
     this->validator = new Validator();
+    this->logs = std::vector<Log*>();
 }
 
 System::~System()

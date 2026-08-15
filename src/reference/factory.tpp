@@ -1,5 +1,5 @@
 
-#include "../../reference/factory.hpp"
+#include "factory.hpp"
 
 template<class C>
 std::map<int, Argument> Factory<C>::ready_args()
@@ -48,6 +48,8 @@ C Factory<C>::create(map<int, Argument> &args)
             int conv = stoi(get<string>(args[5].value));
             _ret.setMaxDrones(conv);
         }
+        else
+            _ret.setMaxDrones(1);
     }
     else if constexpr (is_same_v<C, Connection>)
     {
@@ -60,6 +62,8 @@ C Factory<C>::create(map<int, Argument> &args)
             int conv = stoi(get<string>(args[2].value));
             _ret.setMlc(conv);
         }
+        else
+            _ret.setMlc(1);
     }
     else if constexpr (is_same_v<C, Map>)
     {

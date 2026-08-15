@@ -70,7 +70,6 @@ Map::~Map()
 {
     for (auto connection : this->connections)
     {
-        std::cout << "disconnecting " << connection->hub1->name << '-' << connection->hub2->name << std::endl;
         delete connection;
         connection = nullptr;
     }

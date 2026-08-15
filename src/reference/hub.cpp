@@ -51,18 +51,22 @@ void Hub::setZone(optional<string> const &zoneName)
     }
 }
 
-void Hub::setColor(optional<string> const &color)
+void Hub::setColor(std::optional<std::string> const &color)
 {
-    if (color != "")
-        this->color = color;
+    if (color.has_value())
+        this->color = color.value();
     else
         this->color = "default";
 }
 
-void Hub::setMaxDrones(optional<int> max_drones)
+void Hub::setMaxDrones(std::optional<int> maxDrones)
 {
-    if (max_drones != nullopt)
-        this->max_drones = max_drones;
+    if (!maxDrones.has_value())
+        this->max_drones = 1;
+    else if (this->isStart() || this->isEnd())
+        this->max_drones = 50;
+    else
+        this->max_drones = maxDrones.value();
 }
 
 void Hub::setStartOrEnd(std::string const &soe)
@@ -91,33 +95,21 @@ bool Hub::isEnd() const
     return this->end != false;
 }
 
-void Hub::transferDrone(Link &connection, float hubRadius)
+std::vector<Log*> Hub::transferDrone(Link &connection, float hubRadius)
 {
+    std::vector<Log*> logs;
     if (Algorithm::readyFly(connection))
     {
         unsigned int const limit = Algorithm::droneLimit(this, connection);
         for (int _ = 0; _ < limit; _++)
         {
             Drone *drone = this->drones.front();
-            drone->setDestination(connection.hub, hubRadius);
+            int saved = drone->setDestination(connection.hub, hubRadius);
             this->drones.erase(this->drones.begin());
             connection.hub->drones.push_back(drone);
+            auto _log = Log::output(*drone, *connection.hub);
+            logs.push_back(_log);
         }
     }
-}
-
-void Hub::dropInfo() const
-{
-    std::cout << "Information about Hub #" << this->name << ':' << std::endl << std::endl;
-    std::cout << " -\tX: " << this->position_x << std::endl;
-    std::cout << " -\tY: " << this->position_y << std::endl;
-    if (this->color.has_value())
-        std::cout << " -\tColor: " << this->color.value() << std::endl;
-    if (this->zone.has_value())
-        std::cout << " -\tZone: " << this->zone.value() << std::endl;
-    if (this->max_drones.has_value())
-        std::cout << "- \tMax drones: " << this->max_drones.value() << std::endl;
-    if (!this->drones.empty())
-        std::cout << "- Amount of drones: " << this->drones.size() << std::endl;
-    std::cout << endl;
+    return logs;
 }

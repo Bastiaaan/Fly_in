@@ -42,6 +42,8 @@ ExecuteState fly_in(System &sys)
             else
                 Algorithm::movingDrones(sys);
             EndDrawing();
+            if (sys._map.getHub("goal")->drones.size() == sys.nb_drones)
+                WindowShouldClose();
         }
         throw AlgoException("Oh oh, could not Fly-In the drones :(");
     }
