@@ -16,8 +16,15 @@ Hub::~Hub()
 {
     if (!this->drones.empty())
     {
-        for (auto const drone : this->drones)
-            delete[] drone;
+        for (auto drone : this->drones) {
+            delete drone;
+            drone = nullptr;
+        }
+    }
+    if (this->location != nullptr)
+    {
+        delete this->location;
+        location = nullptr;
     }
 }
 
@@ -101,10 +108,10 @@ std::vector<Log*> Hub::transferDrone(Link &connection, float hubRadius)
     if (Algorithm::readyFly(connection))
     {
         unsigned int const limit = Algorithm::droneLimit(this, connection);
-        for (int _ = 0; _ < limit; _++)
+        for (unsigned int _ = 0; _ < limit; _++)
         {
             Drone *drone = this->drones.front();
-            int saved = drone->setDestination(connection.hub, hubRadius);
+            drone->setDestination(connection.hub, hubRadius);
             this->drones.erase(this->drones.begin());
             connection.hub->drones.push_back(drone);
             auto _log = Log::output(*drone, *connection.hub);

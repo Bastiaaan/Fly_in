@@ -21,7 +21,7 @@ class Hub {
 	public:
 		Hub();
 		~Hub();
-		int max_drones;
+		unsigned int max_drones;
 		bool start;
 		bool end;
 		std::string name;
@@ -56,5 +56,5 @@ struct HubPoint
 struct Link
 {
 	Hub *hub;
-	int max_link_capacity;
+	unsigned int max_link_capacity;
 };

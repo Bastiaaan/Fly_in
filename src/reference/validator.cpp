@@ -23,7 +23,7 @@ ExecuteState Validator::saveRec(string &buffer, unsigned int line)
 ValidationResult Validator::Execute() {
     try
     {
-        FailureCause cause;
+        //FailureCause cause;
         std::cout << "checking the rules of this wretched file;" << std::endl << std::endl;
         for (auto [rule, record] : this->mapRows)
         {

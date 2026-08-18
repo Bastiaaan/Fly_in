@@ -71,6 +71,11 @@ struct MeasureBank
         bank.endActionRadius_y = bank.screenHeight - bank.startActionRadius_y;
         bank.hubRangeX = _range('x');
         bank.hubRangeY = _range('y'); // each of them are incremented by two to get the right amount of lines for correct representation.
+        // if (map.difficulty == "challenger")
+        // {
+        //     bank.hubRangeX.push_back(bank.hubRangeX.size() + 1);
+        //     bank.hubRangeY.push_back(bank.hubRangeY.size() + 1);
+        // }
         return bank;
     }
     void saveLine(Line const &line)
@@ -89,7 +94,7 @@ class Renderer {
         static Color resolveColor(Hub &hub);
         static std::pair<std::pair<int, int>, std::pair<int, int>> cutExcessPixels(Hub *origin, Link next);
         static void renderBackground(System &sys, MeasureBank &sizes);
-        static void renderBackgroundLines(System &sys, MeasureBank &sizes, map<string, bool> &checkList);
+        static void renderBackgroundLines(MeasureBank &sizes, map<string, bool> &checkList);
         static void renderHubs(System &sys, MeasureBank &sizes);
         static void renderConnections(System &sys, MeasureBank const &sizes);
         static void renderDrones(System &sys, MeasureBank const &sizes);

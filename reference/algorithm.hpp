@@ -1,4 +1,5 @@
 #pragma once
+#include <map>
 #include "system.hpp"
 
 // must behave like an independent member to make the drones move to the right hubs
@@ -10,7 +11,7 @@ class Algorithm
         static int rotateDrones(System &sys, float hubRadius);
         static std::vector<Hub*> containingDrones(System const &sys);
         static void movingDrones(System const &sys);
-        static bool foundTheEnd(Hub const &origin, Hub const &hub);
+        static int untilTheEnd(Hub const &origin, Hub const &hub);
         static bool foundTheEnd(Hub const &origin, Hub const &hub, std::unordered_set<Hub const*>* visited); // recursion may be applied here
         static std::map<Link *, int> getConnectionCosts(Hub const &hub);
         static bool readyFly(Link const &connection);

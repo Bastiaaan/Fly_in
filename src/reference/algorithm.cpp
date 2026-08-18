@@ -24,27 +24,6 @@ bool Algorithm::noDroneFlies(System const &sys)
     );
 }
 
-static int untilEnd(Hub const &hub, std::vector<int> &steps, int current = 0)
-{
-    if (hub.isEnd())
-    {
-        steps.push_back(current);
-        return current;
-    }
-
-    if (hub.connections.empty())
-        return static_cast<int>(INFINITY);
-
-    for (auto const &connection : hub.connections)
-    {
-        Link *conn = connection.second;
-        int penalty = (conn->hub->zone == Restricted) ? 1 : 0;
-        untilEnd(*conn->hub, steps, current + 1 + penalty);
-    }
-
-    return steps.empty() ? static_cast<int>(INFINITY) : *std::min_element(steps.begin(), steps.end());
-}
-
 int Algorithm::rotateDrones(System &sys, float const hubRadius)
 {
     std::vector<Hub*> const found = containingDrones(sys);
@@ -56,14 +35,20 @@ int Algorithm::rotateDrones(System &sys, float const hubRadius)
         if (!_hub->connections.empty())
         {
             std::vector<int> steps;
-            int result = untilEnd(*_hub, steps, 0);
             auto candidates = getConnectionCosts(*_hub);
             if (!candidates.empty())
             {
-                std::vector<Link*> equal_costs;
-                std::copy_if(candidates.begin(), candidates.end(), std::back_inserter(equal_costs),
-                    [](pair<Link *, int> rec1, pair<Link *, int> rec2){ return rec1.second == rec2.second; }, equal_costs);
-                for (auto [link, cost] : candidates)
+                int lowestCost = std::min_element(candidates.begin(), candidates.end(),
+                    [](std::pair<Link *, int> conn1, std::pair<Link *, int> conn2) -> bool
+                    { return conn1.second < conn2.second; })->second;
+
+                std::vector<pair<Link *, int>> selected;
+                std::copy_if(candidates.begin(), candidates.end(), std::back_inserter(selected),
+                    [lowestCost](const std::pair<Link*, int>& record) -> bool {
+                    return record.second == lowestCost;
+                });
+
+                for (auto [link, cost] : selected)
                 {
                     _hub->transferDrone(*link, hubRadius);
                 }
@@ -73,15 +58,16 @@ int Algorithm::rotateDrones(System &sys, float const hubRadius)
             }
         }
     }
-    return 1;
+    return turns;
 }
 
-bool Algorithm::foundTheEnd(Hub const &origin, Hub const &hub) {
+int Algorithm::untilTheEnd(Hub const &origin, Hub const &hub) {
     auto visited = new unordered_set<Hub const*>();
     bool const result = foundTheEnd(origin, hub, visited);
+    int const steps = !result ? static_cast<int>(INFINITY) : visited->size();
     delete visited;
     visited = nullptr;
-    return result;
+    return steps;
 }
 
 bool Algorithm::foundTheEnd(
@@ -122,6 +108,7 @@ std::map<Link *, int> Algorithm::getConnectionCosts(Hub const &hub)
     for (auto [_, connection] : hub.connections)
     {
         int cost = 0;
+        Hub const *nextHub = connection->hub;
         if (connection->hub->zone == Restricted)
             cost += 4;
         else if (connection->hub->zone == Priority)
@@ -131,23 +118,11 @@ std::map<Link *, int> Algorithm::getConnectionCosts(Hub const &hub)
         else
             cost += 2;
 
-        if (connection->max_link_capacity > 1)
-        {
-            if (connection->max_link_capacity > hub.drones.size())
-                cost += connection->max_link_capacity - hub.drones.size();
-            else
-                cost += connection->max_link_capacity;
-        }
-        if (connection->hub->max_drones > 1)
-        {
-            if (connection->hub->max_drones >= hub.drones.size())
-                cost += connection->hub->max_drones - hub.drones.size();
-            else
-                cost += connection->hub->max_drones;
-        }
-        if (!foundTheEnd(hub, *connection->hub))
-             cost += static_cast<int>(INFINITY);
-        if (cost != static_cast<int>(INFINITY))
+        if (nextHub->max_drones == nextHub->drones.size())
+            cost += 2;
+        else
+            cost += nextHub->drones.size() - nextHub->max_drones;
+        if (untilTheEnd(hub, *connection->hub) != static_cast<int>(INFINITY))
             costs.insert({connection, cost});
     }
     return costs;
@@ -165,8 +140,8 @@ void Algorithm::movingDrones(System const &sys)
 
 unsigned int Algorithm::droneLimit(Hub const *hub, Link const &connection)
 {
-    unsigned int drones = hub->drones.size();
-    unsigned int nextDrones = connection.hub->drones.size();
+    unsigned int drones = static_cast<unsigned int>(hub->drones.size());
+    unsigned int nextDrones = static_cast<unsigned int>(connection.hub->drones.size());
 
     if (connection.hub->max_drones > 1 || connection.max_link_capacity > 1)
     {
@@ -197,5 +172,5 @@ bool Algorithm::readyFly(Link const &connection)
     return (connection.hub->drones.size() < connection.max_link_capacity &&
             connection.max_link_capacity > 1) ||
             (connection.hub->max_drones > 1 && connection.hub->drones.size() < connection.hub->max_drones) ||
-            connection.max_link_capacity == 1 && connection.hub->max_drones == 1;
+            (connection.max_link_capacity == 1 && connection.hub->max_drones == 1);
 }

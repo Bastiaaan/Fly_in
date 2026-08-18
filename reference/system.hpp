@@ -68,7 +68,7 @@ class System
 	public:
 		int score;
 		int turn;
-        int nb_drones;
+        unsigned long nb_drones;
 		std::string mapSrc;
         Map _map;
 		std::vector<Log*> logs;

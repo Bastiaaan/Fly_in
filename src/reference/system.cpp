@@ -245,7 +245,7 @@ ExecuteState System::initDrones()
         Hub *start = this->_map.hubs.front();
         if (start == nullptr)
             throw logic_error("Start hub was not found");
-        for (int id = 0; id < this->nb_drones; id++)
+        for (unsigned int id = 0; id < this->nb_drones; id++)
         {
             std::cout << "Installing drone #" << id + 1 << std::endl;
             auto *drone = new Drone(id + 1);

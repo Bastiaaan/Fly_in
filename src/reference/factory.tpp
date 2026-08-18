@@ -59,7 +59,7 @@ C Factory<C>::create(map<int, Argument> &args)
             _ret.setHub2(get<Hub*>(args[resolveKey("hub2", args)].value));
         if (resolveKey("max_link_capacity", args) != -1 && !get<string>(args[2].value).empty())
         {
-            int conv = stoi(get<string>(args[2].value));
+            unsigned int conv = stoi(get<string>(args[2].value));
             _ret.setMlc(conv);
         }
         else

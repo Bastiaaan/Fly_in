@@ -1,3 +1,6 @@
 
 en.subject.pdf
 cmake-build-debug/*
+obj
+obj/*
+fly_in

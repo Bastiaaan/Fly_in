@@ -1,5 +1,6 @@
 
 #include <raylib.h>
+#include <map>
 
 #include "algorithm.hpp"
 #include "fly_in.hpp"
@@ -7,9 +8,8 @@
 
 ExecuteState fly_in(System &sys)
 {
-    auto const start = sys._map.getHub("start");
-    auto const end = sys._map.getHub("end");
-    for (int i = 0; i < sys.nb_drones; i++)
+    //auto const start = sys._map.getHub("start");
+    for (unsigned long i = 0; i < sys.nb_drones; i++)
     {
         auto *drone = new Drone(i+1);
         sys._map.available_drones.push_back(drone);
@@ -33,7 +33,7 @@ ExecuteState fly_in(System &sys)
         {
             BeginDrawing();
             Renderer::renderBackground(sys, sizes);
-            Renderer::renderBackgroundLines(sys, sizes, checkList);
+            Renderer::renderBackgroundLines(sizes, checkList);
             Renderer::renderConnections(sys, sizes);
             Renderer::renderHubs(sys, sizes);
             Renderer::renderDrones(sys, sizes);
@@ -43,7 +43,9 @@ ExecuteState fly_in(System &sys)
                 Algorithm::movingDrones(sys);
             EndDrawing();
             if (sys._map.getHub("goal")->drones.size() == sys.nb_drones)
-                WindowShouldClose();
+            {
+                //CloseWindow();
+            }
         }
         throw AlgoException("Oh oh, could not Fly-In the drones :(");
     }

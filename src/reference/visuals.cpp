@@ -7,11 +7,11 @@
 HubPoint* Renderer::locateHub(Hub &hub, std::vector<Line> const &lines)
 {
     std::vector<Line> match;
-    back_insert_iterator<vector<Line>> points = std::copy_if(lines.begin(), lines.end(), std::back_inserter(match),
-                                                             [&hub](Line const &line) -> bool {
-                                                                 return (hub.position_x == line.pos_x && hub.position_y == line.pos_y) ||
-                                                                        (hub.position_x == -1 && hub.position_y == line.pos_y);
-                                                             });
+    std::copy_if(lines.begin(), lines.end(), std::back_inserter(match),
+                [&hub](Line const &line) -> bool {
+                    return (hub.position_x == line.pos_x && hub.position_y == line.pos_y) ||
+                            (hub.position_x == -1 && hub.position_y == line.pos_y);
+                });
 
     if (match.size() == 2) {
         Line vert = match[0];
@@ -91,7 +91,7 @@ void Renderer::renderBackground(System &sys, MeasureBank &sizes)
     DrawText(TextFormat("Map: %s", sys._map.name.c_str()), sizes.screenWidth / 3 + 230, 20, 50, BLACK);
 }
 
-void Renderer::renderBackgroundLines(System &sys, MeasureBank &sizes, map<string, bool> &checkList)
+void Renderer::renderBackgroundLines(MeasureBank &sizes, map<string, bool> &checkList)
 {
     unsigned long const total_x_radius = sizes.screenWidth;
     unsigned long const total_y_radius = sizes.screenHeight;
@@ -129,7 +129,7 @@ void Renderer::renderBackgroundLines(System &sys, MeasureBank &sizes, map<string
         DrawLine(horr_line.startx, horr_line.starty,
                          horr_line.endx,horr_line.endy, LIGHTGRAY);
 
-        for (int i = 0; i <= sizes.hubRangeX.size(); i++)
+        for (unsigned int i = 0; i <= sizes.hubRangeX.size(); i++)
         {
             horr_line.pos_x = i;
             if (!checkList["horizontal_lines"])

@@ -1,5 +1,6 @@
 
 #pragma once
+# include <optional>
 # include "fly_in.hpp"
 
 struct ExecuteState;
@@ -34,6 +35,7 @@ struct ValidationResult
     static ValidationResult Fail(FailureCause cause)
     {
         ValidationResult res;
+        res.cause.value() = cause;
         res.passed = false;
         return res;
     }
