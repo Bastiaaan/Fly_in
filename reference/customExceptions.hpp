@@ -1,19 +1,24 @@
 #pragma once
-# include "validator.hpp"
-
-enum class FailureCause;
+#include <exception>
+#include <optional>
+#include <string>
+#include "validator.hpp"
 
 class ParseException : public std::exception
 {
-    private:
-        std::string errMsg;
-        std::optional<FailureCause> cause;
-    public:
-        ParseException(std::string const &msg, FailureCause &cause) : errMsg(msg), cause(cause) {}
-        const std::string what() noexcept {
-            return "Error while parsing:\n" + this->errMsg;
-        }
-        ParseException(std::string const &msg) : errMsg(msg) {}
+private:
+    std::string errMsg;
+public:
+    // ParseException(std::string const &msg, FailureCause const &c)
+    //     : errMsg("Error while parsing:\n" + msg + "\nReason: " + (c)) {}
+
+    ParseException(std::string const &msg)
+        : errMsg("Error while parsing:\n" + msg) {}
+
+    const char *what() const noexcept override
+    {
+        return errMsg.c_str();
+    }
 };
 
 class AlgoException : public std::exception
@@ -21,10 +26,12 @@ class AlgoException : public std::exception
     private:
         std::string errMsg;
     public:
-        AlgoException(const std::string msg) : errMsg(msg) {}
-        const std::string what() noexcept
+        AlgoException(std::string const &msg)
+			: errMsg("Couldn't proceed algorithm:\n" + msg) {}
+
+        const char *what() const noexcept override
         {
-            return "Error while handling drones: " + this->errMsg;
+            return errMsg.c_str();
         }
 };
 

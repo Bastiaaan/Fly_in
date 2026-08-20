@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/fly_in.dir/src/fly_in.cpp.o CMakeFiles/fly_in.dir/src/main.cpp.o CMakeFiles/fly_in.dir/src/utils.cpp.o -o fly_in  -Wl,-rpath,/home/brogaar/core/fly_in/lib ../lib/libraylib.so 

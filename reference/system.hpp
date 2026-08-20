@@ -2,6 +2,7 @@
 #pragma once
 
 #include <any>
+#include <optional>
 #include "map.hpp"
 #include "validator.hpp"
 
@@ -13,8 +14,8 @@ struct ExecuteState
 {
     bool success = false;
     std::any result;
-    optional<unsigned int> line;
-    optional<std::string> why;
+    std::optional<unsigned int> line;
+    std::optional<std::string> why;
 	static ExecuteState Fail(std::string const &reason, unsigned int line = -1)
 	{
 		ExecuteState s;

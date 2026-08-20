@@ -5,11 +5,11 @@
 
 struct Line
 {
-    int pos_x, pos_y;
-    int startx;
-    int starty;
-    int endx;
-    int endy;
+    int pos_x = -1, pos_y = 0;
+    int startx = 0;
+    int starty = 0;
+    int endx = 0;
+    int endy = 0;
     std::string type;
     static Line Save(int sx, int sy, int ex, int ey, int x = -1, int y = 0, std::string const &type = "") {
         auto result = Line();
@@ -46,36 +46,43 @@ struct MeasureBank
         bank.monitorID = monitor;
         bank.screenWidth = (GetMonitorWidth(monitor) / 100) * 90;
         bank.screenHeight = (GetMonitorHeight(monitor) / 100) * 85;
-        auto _range = [&map](char const c) -> std::vector<int>
-        {
-            std::vector<int> result;
+        auto _range = [&map](char const axis) -> std::vector<int>
+		{
+    		std::vector<int> result;
 
-            if (c == 'x' || c == 'y')
-            {
-                for (auto const *hub : map.hubs)
-                {
-                    int coord = c == 'x' ? hub->position_x : hub->position_y;
-                    if (std::find(result.begin(), result.end(), coord) == result.end())
-                        result.push_back(coord);
-                }
-                if (c == 'y' && std::any_of(result.begin(), result.end(), [](int const n){ return n < 0; }))
-                    std::sort(result.begin(), result.end(), std::greater<int>{});
-                else
-                    std::sort(result.begin(), result.end());
-            }
-            return result;
-        };
+    		if ((axis != 'x' && axis != 'y') || map.hubs.empty())
+        		return result;
+
+    		int minCoord = axis == 'x' ? map.hubs.front()->position_x
+                               : map.hubs.front()->position_y;
+    		int maxCoord = minCoord;
+
+    		for (auto const* hub : map.hubs)
+    		{
+    			if (hub == nullptr)
+        			continue;
+
+        		int const coord = axis == 'x' ? hub->position_x : hub->position_y;
+        		minCoord = std::min(minCoord, coord);
+        		maxCoord = std::max(maxCoord, coord);
+    		}
+
+    		for (int coord = minCoord; coord <= maxCoord; ++coord)
+        		result.push_back(coord);
+
+    		if (axis == 'y' && minCoord < 0)
+        		std::reverse(result.begin(), result.end());
+
+    		return result;
+		};
         bank.startActionRadius_x = bank.screenWidth / 40;
         bank.startActionRadius_y = bank.screenHeight / 27;
         bank.endActionRadius_x = bank.screenWidth - bank.startActionRadius_x;
         bank.endActionRadius_y = bank.screenHeight - bank.startActionRadius_y;
         bank.hubRangeX = _range('x');
-        bank.hubRangeY = _range('y'); // each of them are incremented by two to get the right amount of lines for correct representation.
-        // if (map.difficulty == "challenger")
-        // {
-        //     bank.hubRangeX.push_back(bank.hubRangeX.size() + 1);
-        //     bank.hubRangeY.push_back(bank.hubRangeY.size() + 1);
-        // }
+        bank.hubRangeY = _range('y');
+		
+		// ...existing code...
         return bank;
     }
     void saveLine(Line const &line)

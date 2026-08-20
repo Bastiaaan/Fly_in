@@ -9,8 +9,6 @@
 #include "fly_in.hpp"
 #include "factory.tpp"
 
-using namespace std;
-
 System::System()
 {
     this->nb_drones = 0;
@@ -33,10 +31,10 @@ void System::verboseFree(ExecuteState const &ex)
 {
     if (!ex.success)
     {
-        if (ex.line != nullopt)
-            cout << "ERROR " << std::any_cast<string>(ex.why) << endl << "At line " << std::any_cast<int>(ex.line) << endl;
+        if (ex.line != std::nullopt)
+            cout << "ERROR " << std::any_cast<std::string>(ex.why) << endl << "At line " << std::any_cast<int>(ex.line) << endl;
         else
-            cout << "ERROR: " << std::any_cast<string>(ex.why) << endl;
+            cout << "ERROR: " << std::any_cast<std::string>(ex.why) << endl;
     }
     else
         cout << "No errors found" << endl;
@@ -46,14 +44,14 @@ ExecuteState System::mapsBasePath()
 {
     try
     {
-        string const currentPath = filesystem::current_path().string();
-        vector<string> const parts = split(currentPath, '/');
+        std::string const currentPath = filesystem::current_path().string();
+        vector<std::string> const parts = split(currentPath, '/');
         unsigned int fly_in = 0;
         while (parts[fly_in] != "fly_in")
             fly_in++;
         fly_in++;
-        string const _core = join(parts, '/', fly_in);
-        string const &result = _core + "/maps/";
+        std::string const _core = join(parts, '/', fly_in);
+        std::string const &result = _core + "/maps/";
         return ExecuteState::Ok(result);
     }
     catch (exception &ex)
@@ -89,8 +87,8 @@ ExecuteState System::Load(std::string const &level, std::string const &difficult
     {
         unsigned int line = 0;
         auto result = mapResult.result;
-        string const &base = any_cast<string>(result);
-        string const target = base + difficulty + '/' + level;
+        std::string const &base = std::any_cast<std::string>(result);
+        std::string const target = base + difficulty + '/' + level;
         std::ifstream _mapped(target);
         if (!_mapped.is_open())
             return ExecuteState::Fail("Could not open map '" + target + "'", 0);
@@ -107,40 +105,40 @@ ExecuteState System::Load(std::string const &level, std::string const &difficult
                     {
                         ExecuteState res = this->validator->saveRec(buffer, line);
                         if (!res.success)
-                            throw std::logic_error(std::any_cast<string>(res.why));
+                            throw std::logic_error(std::any_cast<std::string>(res.why));
                         vector<string> keyRow = split(buffer, ':');
                         if (keyRow.size() != 2) {
                             _mapped.close();
                             return ExecuteState::Fail("Each row should only contain one double column", line);
                         }
-                        string const &key = keyRow[0];
-                        string const &row = keyRow[1];
+                        std::string const &key = keyRow[0];
+                        std::string const &row = keyRow[1];
                         if (key == "start_hub" || key == "end_hub" || key == "hub")
                         {
-                            vector<string> values = split(row, ' ');
+                            std::vector<std::string> values = split(row, ' ');
                             unsigned int opened_meta = 0;
                             int pos = 0;
                             values.erase(values.begin());
-                            map<int, Argument> args = Factory<Hub>::ready_args();
+                            std::map<int, Argument> args = Factory<Hub>::ready_args();
                             for (const auto &rec : values)
                             {
-                                if (rec.find('[') != string::npos)
+                                if (rec.find('[') != std::string::npos)
                                     opened_meta++;
 
                                 if (opened_meta > 0)
                                 {
-                                    vector<string> meta_pairs = split(rec, '=');
+                                    std::vector<std::string> meta_pairs = split(rec, '=');
                                     if (meta_pairs.size() != 2)
                                         throw std::logic_error("unusual assignments found");
-                                    string metaName = meta_pairs[0];
-                                    string metaValue = meta_pairs[1];
-                                    if (metaName.find('[') != string::npos && metaName[0] == '[')
+                                    std::string metaName = meta_pairs[0];
+                                    std::string metaValue = meta_pairs[1];
+                                    if (metaName.find('[') != std::string::npos && metaName[0] == '[')
                                         metaName.erase(0, 1);
-                                    if (metaValue.find(']') != string::npos && metaValue[metaValue.size() - 1] == ']')
+                                    if (metaValue.find(']') != std::string::npos && metaValue[metaValue.size() - 1] == ']')
                                         metaValue.erase(metaValue.size() - 1, 1);
                                     int index = Factory<Hub>::resolveKey(metaName, args);
                                     args[index].value = metaValue;
-                                    if (rec.find(']') != string::npos)
+                                    if (rec.find(']') != std::string::npos)
                                         opened_meta--;
                                 }
                                 else
@@ -155,20 +153,28 @@ ExecuteState System::Load(std::string const &level, std::string const &difficult
                             if (_hub->position_x < 0)
                                 throw ParseException("first number cannot be negative");
                             if (key == "start_hub")
+							{
                                 _hub->setStartOrEnd("start");
+								if (this->nb_drones > 0)
+									_hub->max_drones = this->nb_drones;
+							}
                             else if (key == "end_hub")
+							{
                                 _hub->setStartOrEnd("end");
+								if (this->nb_drones > 0)
+									_hub->max_drones = this->nb_drones;
+							}
                             this->_map.addHub(_hub);
 
                         }
                         else if(key == "connection")
                         {
                             auto args = Factory<Connection>::ready_args();
-                            vector<string> values = split(row, ' ');
+                            std::vector<std::string> values = split(row, ' ');
                             values.erase(values.begin()); // necessary to cut out empty records.
                             if (values.empty() || values.size() > 2)
                                 throw logic_error("Connection definition must consist out of <hub_name>-<hub_name> [...]");
-                            vector<string> hubs = split(values[0], '-');
+                            std::vector<std::string> hubs = split(values[0], '-');
                             if (hubs.size() != 2)
                                 throw logic_error("Invalid connection definition detected");
                             if (this->_map.getHub(hubs[0]) == nullptr)
@@ -181,19 +187,19 @@ ExecuteState System::Load(std::string const &level, std::string const &difficult
                             args[hub2].value = this->_map.getHub(hubs[1]);
                             if (values.size() == 2)
                             {
-                                if (values[1].find('[') != string::npos &&
-                                    values[1].find(']') != string::npos)
+                                if (values[1].find('[') != std::string::npos &&
+                                    values[1].find(']') != std::string::npos)
                                 {
-                                    vector<string> metaKeyValue = split(values[1], '=');
+                                    std::vector<std::string> metaKeyValue = split(values[1], '=');
                                     if (metaKeyValue.size() != 2)
                                         throw std::logic_error("Connection row only expects one optional record");
-                                    string _key = metaKeyValue[0].erase(0, 1);
-                                    string value = metaKeyValue[1].erase(metaKeyValue[1].length() - 1, 1);
+                                    std::string _key = metaKeyValue[0].erase(0, 1);
+                                    std::string value = metaKeyValue[1].erase(metaKeyValue[1].length() - 1, 1);
                                     int insert = Factory<Connection>::resolveKey(_key, args);
                                     args[insert].value = value;
                                 }
-                                else if (values[1].find('[') == string::npos ||
-                                         values[1].find(']') == string::npos)
+                                else if (values[1].find('[') == std::string::npos ||
+                                         values[1].find(']') == std::string::npos)
                                     throw std::logic_error("Custom brackets enclosed incorrectly");
                             }
                             auto connection = new Connection(Factory<Connection>::create(args));
@@ -259,10 +265,12 @@ ExecuteState System::initDrones()
     }
 }
 
-vector<tuple<int, string, string>> System::get_options(std::string const &difficulty)
+std::vector<tuple<int, std::string, std::string>>
+	System::get_options(std::string const &difficulty)
 {
     cout << "choosing out of options..." << endl;
-    vector<tuple<int, string, string>> options; // <level, display_name, file>
+    std::vector<tuple<int, std::string, std::string>> options;
+	// <level, display_name, file>
     int opt = 0;
     regex pattern(R"(^\d{1,2}_[a-z]+(?:_[a-z]+)*\.txt$)");
     auto const mapResult = mapsBasePath();
@@ -270,13 +278,13 @@ vector<tuple<int, string, string>> System::get_options(std::string const &diffic
         verboseFree(mapResult);
         return options;
     }
-    string const _core = std::any_cast<string>(mapResult.result) + difficulty + '/';
+    string const _core = std::any_cast<std::string>(mapResult.result) + difficulty + '/';
     for (const auto& fileSrc : filesystem::directory_iterator(_core))
     {
         opt++;
-        vector<string> broken = split(fileSrc.path().string(), '/');
-        string fileName = broken[broken.size() - 1];
-        vector fileParts = split(split(fileName, '.')[0], '_');
+        std::vector<string> broken = split(fileSrc.path().string(), '/');
+        std::string fileName = broken[broken.size() - 1];
+        std::vector fileParts = split(split(fileName, '.')[0], '_');
         fileParts.erase(fileParts.begin());
         options.push_back({opt, join(fileParts, ' '), fileName});
     }

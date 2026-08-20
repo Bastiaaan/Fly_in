@@ -8,7 +8,10 @@
 
 ExecuteState fly_in(System &sys)
 {
-    //auto const start = sys._map.getHub("start");
+    auto const end = sys._map.getHub("goal") == nullptr ?
+					 sys._map.getHub("impossible_goal") :
+					 sys._map.getHub("goal");
+					
     for (unsigned long i = 0; i < sys.nb_drones; i++)
     {
         auto *drone = new Drone(i+1);
@@ -37,12 +40,13 @@ ExecuteState fly_in(System &sys)
             Renderer::renderConnections(sys, sizes);
             Renderer::renderHubs(sys, sizes);
             Renderer::renderDrones(sys, sizes);
-            if (Algorithm::noDroneFlies(sys))
-                Algorithm::rotateDrones(sys, sizes.hubRadius.x);
+            if (Algorithm::noDroneFlies(sys) &&
+				end->drones.size() != sys.nb_drones)
+                sys.turn += Algorithm::rotateDrones(sys, sizes.hubRadius.x);
             else
                 Algorithm::movingDrones(sys);
             EndDrawing();
-            if (sys._map.getHub("goal")->drones.size() == sys.nb_drones)
+            if (end->drones.size() == sys.nb_drones)
             {
                 //CloseWindow();
             }

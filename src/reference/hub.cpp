@@ -43,7 +43,7 @@ void Hub::setY(int const y)
     this->position_y = y;
 }
 
-void Hub::setZone(optional<string> const &zoneName)
+void Hub::setZone(std::optional<string> const &zoneName)
 {
     if (zoneName.has_value())
     {
@@ -105,9 +105,10 @@ bool Hub::isEnd() const
 std::vector<Log*> Hub::transferDrone(Link &connection, float hubRadius)
 {
     std::vector<Log*> logs;
-    if (Algorithm::readyFly(connection))
+    if (Algorithm::readyFly(this, connection) && !this->drones.empty())
     {
-        unsigned int const limit = Algorithm::droneLimit(this, connection);
+        unsigned int limit = Algorithm::droneLimit(this, connection);
+		limit = std::min(limit, static_cast<unsigned int>(this->drones.size()));
         for (unsigned int _ = 0; _ < limit; _++)
         {
             Drone *drone = this->drones.front();

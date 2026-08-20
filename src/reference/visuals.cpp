@@ -1,8 +1,8 @@
 
 #include <cmath>
 #include <set>
-
 #include "visuals.hpp"
+#include "raylib.h"
 
 HubPoint* Renderer::locateHub(Hub &hub, std::vector<Line> const &lines)
 {
@@ -31,9 +31,8 @@ HubPoint* Renderer::locateHub(Hub &hub, std::vector<Line> const &lines)
         Line _line = match[0]; // this line is horizontal
         auto found = std::find_if(lines.begin(), lines.end(), [&hub](Line const &l) -> bool {
             return l.pos_x == hub.position_x &&
-                   l.type == "vertical";
-        });
-        Line vert = *found; // this line is the vertical one. It was needed for localization of the hub
+                   l.type == "vertical"; });
+        Line vert = *found; 
         while (_line.startx != vert.startx || _line.starty != vert.starty)
         {
             if (_line.startx != vert.startx) _line.startx++;
@@ -89,6 +88,7 @@ void Renderer::renderBackground(System &sys, MeasureBank &sizes)
     DrawLine(sizes.startActionRadius_x, sizes.startActionRadius_y, sizes.startActionRadius_x, sizes.endActionRadius_y, DARKGRAY);
     DrawLine(sizes.startActionRadius_x, sizes.endActionRadius_y, sizes.endActionRadius_x, sizes.endActionRadius_y, DARKGRAY);
     DrawText(TextFormat("Map: %s", sys._map.name.c_str()), sizes.screenWidth / 3 + 230, 20, 50, BLACK);
+	DrawText(TextFormat("Turn: %d", sys.turn), sizes.endActionRadius_x - 220, sizes.startActionRadius_y + 40, 50, BLACK);
 }
 
 void Renderer::renderBackgroundLines(MeasureBank &sizes, map<string, bool> &checkList)
@@ -105,10 +105,10 @@ void Renderer::renderBackgroundLines(MeasureBank &sizes, map<string, bool> &chec
 
         for (int xtem : sizes.hubRangeX)
         {
-            auto vert_line = Line::Save(incr_x,        // x: start from 0 offset
-                                        0,              // y: top of screen
-                                        incr_x,         // x: same column
-                                        sizes.screenHeight, // y: bottom of screen
+            auto vert_line = Line::Save(incr_x,
+                                        0,
+                                        incr_x,
+                                        sizes.screenHeight,
                                       xtem,
                                       ytem,
                                  "vertical");
@@ -119,10 +119,10 @@ void Renderer::renderBackgroundLines(MeasureBank &sizes, map<string, bool> &chec
             incr_x += step_x;
         }
         checkList["vertical_lines"] = true;
-        auto horr_line = Line::Save(0,                  // x: left of screen
-                                    incr_y,             // y: current row
-                                    sizes.screenWidth,  // x: right of screen
-                                    incr_y,             // y: same row
+        auto horr_line = Line::Save(0,
+                                    incr_y,
+                                    sizes.screenWidth,
+                                    incr_y,
                                   -1,
                                   ytem,
                              "horizontal");
@@ -201,14 +201,61 @@ void Renderer::renderConnections(System &sys, MeasureBank const &sizes)
         }
     }
 
+    Color const linkColor = { 120, 120, 120, 255 };
+
     for (auto const *hub : sys._map.hubs)
     {
         for (const auto &[fst, snd] : hub->connections)
         {
             auto const linked = snd->hub;
-            Vector2 from = {static_cast<float>(hub->location->x), static_cast<float>(hub->location->y)};
-            Vector2 to   = {static_cast<float>(linked->location->x), static_cast<float>(linked->location->y)};
-            DrawLineEx(from, to, 5, GRAY);
+            if (hub->location == nullptr || linked->location == nullptr)
+                continue;
+
+            Vector2 from = { static_cast<float>(hub->location->x), static_cast<float>(hub->location->y) };
+            Vector2 to   = { static_cast<float>(linked->location->x), static_cast<float>(linked->location->y) };
+
+            Vector2 delta = { to.x - from.x, to.y - from.y };
+            float len = std::hypot(delta.x, delta.y);
+            if (len < 1.0f)
+                continue;
+
+            Vector2 dir = { delta.x / len, delta.y / len };
+            Vector2 perp = { -dir.y, dir.x };
+
+            float radius = sizes.hubRadius.x;
+
+            Vector2 start = {
+                from.x + dir.x * (radius + 6.0f),
+                from.y + dir.y * (radius + 6.0f)
+            };
+
+            Vector2 end = {
+                to.x - dir.x * (radius + 10.0f),
+                to.y - dir.y * (radius + 10.0f)
+            };
+
+            DrawLineEx(start, end, 5, linkColor);
+
+            float headLength = 30.0f;
+            float headHalf = 16.0f;
+
+            Vector2 tip = end;
+            Vector2 base = {
+                end.x - dir.x * headLength,
+                end.y - dir.y * headLength
+            };
+
+            Vector2 left = {
+                base.x + perp.x * headHalf,
+                base.y + perp.y * headHalf
+            };
+
+            Vector2 right = {
+                base.x - perp.x * headHalf,
+                base.y - perp.y * headHalf
+            };
+
+            DrawTriangle(tip, right, left, linkColor);
         }
     }
 }
