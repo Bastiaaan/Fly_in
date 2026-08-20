@@ -12,7 +12,6 @@ Drone::Drone(int const id)
 
 Drone::~Drone()
 {
-    std::cout << "self-destruct! ID #" << this->id << std::endl;
     if (this->location != nullptr)
     {
         delete this->location;

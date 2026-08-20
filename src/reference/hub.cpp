@@ -26,6 +26,15 @@ Hub::~Hub()
         delete this->location;
         location = nullptr;
     }
+	if (!this->connections.empty())
+	{
+		for(auto [name, link] : this->connections)
+		{
+			delete link;
+			link = nullptr;
+			this->connections.erase(name);
+		}
+	}
 }
 
 void Hub::setName(std::string const &name)

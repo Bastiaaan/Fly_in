@@ -26,9 +26,11 @@ bool Algorithm::noDroneFlies(System const &sys)
 
 int Algorithm::rotateDrones(System &sys, float const hubRadius)
 {
-    std::vector<Hub*> const found = containingDrones(sys);
 	std::vector<int> rotations;
+	std::vector<Log*> logs;
+    std::vector<Hub*> const found = containingDrones(sys);
     int turn = 0;
+	
     if (found.empty())
         return turn;
     for (auto _hub : found)
@@ -39,33 +41,35 @@ int Algorithm::rotateDrones(System &sys, float const hubRadius)
             auto candidates = getConnectionCosts(*_hub);
             if (!candidates.empty())
             {
-                int lowestCost = std::min_element(candidates.begin(), candidates.end(),
-                    [](std::pair<Link *, int> conn1, std::pair<Link *, int> conn2) -> bool
+                int lowestCost =
+				std::min_element(candidates.begin(), candidates.end(),
+                    [](std::pair<Link *, int> conn1,
+					   std::pair<Link *, int> conn2) -> bool
                     { return conn1.second < conn2.second; })->second;
 
                 std::vector<pair<Link *, int>> selected;
-                std::copy_if(candidates.begin(), candidates.end(), std::back_inserter(selected),
+                std::copy_if(candidates.begin(), candidates.end(),
+				std::back_inserter(selected),
                     [lowestCost](const std::pair<Link*, int>& record) -> bool {
                     return record.second == lowestCost;
                 });
 
 				turn = std::any_of(selected.begin(), selected.end(),
-					[](pair<Link *, int> &row) -> bool
-					{ 
+					[](pair<Link *, int> &row) -> bool {
 						return row.first->hub->zone == Restricted; 
 					}) ? 2 : 1;
 
                 for (auto [link, cost] : selected)
                 {
-                    _hub->transferDrone(*link, hubRadius);
+                    auto _logs = _hub->transferDrone(*link, hubRadius);
+					for (auto &log : _logs)
+						logs.push_back(log);
                 }
 				rotations.push_back(turn);
-                // for (auto log : logs)
-                //     std::cout << log->_output << " ", sys.logs.push_back(log);
-                // std::cout << std::endl;
             }
         }
     }
+	sys.logs[sys.logs.size() + 1] = logs;
     return std::any_of(rotations.begin(), rotations.end(),
 		[](int &rec) -> bool { return rec == 2; }) ? 2 : 1;
 }

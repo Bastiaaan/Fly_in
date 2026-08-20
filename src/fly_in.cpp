@@ -32,7 +32,9 @@ ExecuteState fly_in(System &sys)
         checkList.insert({"vertical_lines", false});
         checkList.insert({"horizontal_lines", false});
         checkList.insert({"connecting_hubs", false});
-        while(!WindowShouldClose())
+		for (unsigned int n = 0; n < 10; n++)
+			std::cout << std::endl;
+        while(!WindowShouldClose() || end->drones.size() != sys.nb_drones)
         {
             BeginDrawing();
             Renderer::renderBackground(sys, sizes);
@@ -42,16 +44,34 @@ ExecuteState fly_in(System &sys)
             Renderer::renderDrones(sys, sizes);
             if (Algorithm::noDroneFlies(sys) &&
 				end->drones.size() != sys.nb_drones)
+			{
                 sys.turn += Algorithm::rotateDrones(sys, sizes.hubRadius.x);
+				sys.verboseLog(sys.logs.size());
+			}
             else
                 Algorithm::movingDrones(sys);
-            EndDrawing();
             if (end->drones.size() == sys.nb_drones)
             {
-                //CloseWindow();
+				if (std::any_of(end->drones.begin(), end->drones.end(),
+					[](Drone const *drone) -> bool {
+						return drone->flying();
+					}))
+					Algorithm::movingDrones(sys);
+				else
+				{
+					DrawText(
+						"Simulation complete! Until next time :)",
+						sizes.screenWidth / 2 - 500,
+						sizes.startActionRadius_y + 40, 50, LIME);
+            		EndDrawing();
+                    WaitTime(1.5);
+					CloseWindow();
+				}
             }
+			if (!WindowShouldClose())
+            	EndDrawing();
         }
-        throw AlgoException("Oh oh, could not Fly-In the drones :(");
+		return ExecuteState::Ok("all drones have reached the end :)");
     }
     catch(AlgoException &ex)
     {

@@ -69,10 +69,12 @@ class System
 	public:
 		int score;
 		int turn;
+		bool is_graphic;
         unsigned long nb_drones;
 		std::string mapSrc;
         Map _map;
-		std::vector<Log*> logs;
+		std::map<int, std::vector<Log*>> logs;
+		void verboseLog(int const n);
         Validator *validator;
 		ExecuteState initDrones();
 		ExecuteState registerTurn();

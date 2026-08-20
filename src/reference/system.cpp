@@ -18,13 +18,24 @@ System::System()
     this->turn = 0;
     this->_map = Map();
     this->validator = new Validator();
-    this->logs = std::vector<Log*>();
+    this->logs = std::map<int, std::vector<Log*>>();
 }
 
 System::~System()
 {
     cout << endl << "==== shutting down ====" << endl;
     delete this->validator;
+	if (this->logs.empty())
+		return;
+	for (auto found : this->logs)
+	{
+		std::vector<Log*> logs = found.second;
+		for (Log * log : logs)
+		{
+			delete log;
+			log = nullptr; // to prevent dangling pointers after 'free'.
+		}
+	}
 }
 
 void System::verboseFree(ExecuteState const &ex)
@@ -38,6 +49,16 @@ void System::verboseFree(ExecuteState const &ex)
     }
     else
         cout << "No errors found" << endl;
+}
+
+void System::verboseLog(int const n)
+{
+	std::vector<Log*> logsPerTurn = this->logs[n];
+	if (logsPerTurn.empty())
+		return;
+	for (Log const *log : logsPerTurn)
+		std::cout << log->_output << " ";
+	std::cout << std::endl;
 }
 
 ExecuteState System::mapsBasePath()
