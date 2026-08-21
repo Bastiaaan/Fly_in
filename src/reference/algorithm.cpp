@@ -42,20 +42,26 @@ int Algorithm::rotateDrones(System &sys, float const hubRadius)
             if (!candidates.empty())
             {
                 int lowestCost =
-				std::min_element(candidates.begin(), candidates.end(),
-                    [](std::pair<Link *, int> conn1,
-					   std::pair<Link *, int> conn2) -> bool
-                    { return conn1.second < conn2.second; })->second;
+				get<0>(std::min_element(candidates.begin(), candidates.end(),
+                    [](std::pair<Link *, std::tuple<int, int>> conn1,
+					   std::pair<Link *, std::tuple<int, int>> conn2) -> bool
+                    { return get<0>(conn1.second) < get<0>(conn2.second); })->second);
 
-                std::vector<pair<Link *, int>> selected;
+                // int leastSteps = 
+				// get<1>(std::min_element(candidates.begin(), candidates.end(),
+                //     [](std::pair<Link *, std::tuple<int, int>> conn1,
+				// 	   std::pair<Link *, std::tuple<int, int>> conn2) -> bool
+                //     { return get<1>(conn1.second) < get<1>(conn2.second); })->second);
+
+                std::vector<pair<Link *, std::tuple<int, int>>> selected;
                 std::copy_if(candidates.begin(), candidates.end(),
 				std::back_inserter(selected),
-                    [lowestCost](const std::pair<Link*, int>& record) -> bool {
-                    return record.second == lowestCost;
+                    [lowestCost](const std::pair<Link *, std::tuple<int, int>>& record) -> bool {
+                    return get<0>(record.second) == lowestCost;
                 });
 
 				turn = std::any_of(selected.begin(), selected.end(),
-					[](pair<Link *, int> &row) -> bool {
+					[](std::pair<Link *, std::tuple<int, int>> &row) -> bool {
 						return row.first->hub->zone == Restricted; 
 					}) ? 2 : 1;
 
@@ -74,13 +80,29 @@ int Algorithm::rotateDrones(System &sys, float const hubRadius)
 		[](int &rec) -> bool { return rec == 2; }) ? 2 : 1;
 }
 
-int Algorithm::untilTheEnd(Hub const &origin, Hub const &hub) {
-    auto visited = new unordered_set<Hub const*>();
+int Algorithm::untilTheEnd(Hub const &origin, Hub const &hub)
+{
+    auto visited = new std::unordered_set<Hub const*>();
     bool const result = foundTheEnd(origin, hub, visited);
     int const steps = !result ? 2147483647 : visited->size();
+
+    if (steps == 2147483647)
+        return steps;
+
+    auto totalCost = [&visited]() -> int
+    {
+        int cost = 0;
+        for (auto hub = visited->begin(); hub != visited->end(); hub++)
+        {
+            cost += (*hub)->zone != Restricted ? 1 : 2;
+        }
+        return cost;
+    };
+
+    int total = totalCost();
     delete visited;
     visited = nullptr;
-    return steps;
+    return total;
 }
 
 bool Algorithm::foundTheEnd(
@@ -91,19 +113,15 @@ bool Algorithm::foundTheEnd(
     if (&hub == &origin)
         return false;
 
-    // Circular trap
     if (!visited->insert(&hub).second)
         return false;
 
-    // We reached an end
     if (hub.isEnd())
         return true;
 
-    // No way forward
     if (hub.connections.empty())
         return false;
 
-    // Search all possible outgoing connections
     for (auto const& [_, link] : hub.connections)
     {
         if (foundTheEnd(origin, *link->hub, visited))
@@ -113,9 +131,9 @@ bool Algorithm::foundTheEnd(
     return false;
 }
 
-std::map<Link *, int> Algorithm::getConnectionCosts(Hub const &hub)
+std::map<Link *, std::tuple<int, int>> Algorithm::getConnectionCosts(Hub const &hub)
 {
-    std::map<Link *, int> costs;
+    std::map<Link *, std::tuple<int, int>> costs;
     if (hub.connections.empty())
         return costs;
     for (auto [_, connection] : hub.connections)
@@ -134,12 +152,14 @@ std::map<Link *, int> Algorithm::getConnectionCosts(Hub const &hub)
             cost += 3;
 		if (space < 1)
 			cost += 5;
+        else
+            cost += 2;
         if (nextHub->max_drones == nextHub->drones.size())
             cost += 5;
         else
             cost -= nextHub->max_drones;
         if (steps != 2147483647)
-            costs.insert({connection, cost});
+            costs.insert({connection, {cost, steps}});
     }
     return costs;
 }

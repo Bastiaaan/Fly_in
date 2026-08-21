@@ -1,5 +1,6 @@
 #pragma once
 #include <map>
+#include <tuple>
 #include "system.hpp"
 
 // must behave like an independent member to make the drones move to the right hubs
@@ -13,7 +14,7 @@ class Algorithm
         static void movingDrones(System const &sys);
         static int untilTheEnd(Hub const &origin, Hub const &hub);
         static bool foundTheEnd(Hub const &origin, Hub const &hub, std::unordered_set<Hub const*>* visited); // recursion may be applied here
-        static std::map<Link *, int> getConnectionCosts(Hub const &hub);
+        static std::map<Link *, std::tuple<int, int>> getConnectionCosts(Hub const &hub);
         static bool readyFly(Hub const *hub, Link const &connection);
         static unsigned int droneLimit(Hub const *hub, Link const &connection);
         static bool noDroneFlies(System const &sys);

@@ -140,6 +140,10 @@ ExecuteState System::Load(std::string const &level, std::string const &difficult
                             unsigned int opened_meta = 0;
                             int pos = 0;
                             values.erase(values.begin());
+                            if (values.size() >= 3)
+                            {
+                                
+                            }
                             std::map<int, Argument> args = Factory<Hub>::ready_args();
                             for (const auto &rec : values)
                             {
@@ -169,7 +173,14 @@ ExecuteState System::Load(std::string const &level, std::string const &difficult
                                 }
                             }
                             if (opened_meta != 0)
-                                throw std::logic_error("Incorrect meta enclosure found");
+                            {
+                                std::string msg = opened_meta > 0
+                                    ? "missing enclosure ']'"
+                                    : "missing opening '['";
+
+                                throw std::logic_error(msg);
+                            }
+
                             auto _hub = new Hub(Factory<Hub>::create(args));
                             if (_hub->position_x < 0)
                                 throw ParseException("first number cannot be negative");
@@ -199,9 +210,9 @@ ExecuteState System::Load(std::string const &level, std::string const &difficult
                             if (hubs.size() != 2)
                                 throw logic_error("Invalid connection definition detected");
                             if (this->_map.getHub(hubs[0]) == nullptr)
-                                throw range_error("First hub is not found");
+                                throw range_error(hubs[0] + " is nowhere found");
                             if (this->_map.getHub(hubs[1]) == nullptr)
-                                throw range_error("Second hub is not found");
+                                throw range_error(hubs[1] + " is nowhere found");
                             int hub1 = Factory<Connection>::resolveKey("hub1", args);
                             int hub2 = Factory<Connection>::resolveKey("hub2", args);
                             args[hub1].value = this->_map.getHub(hubs[0]);
@@ -233,7 +244,7 @@ ExecuteState System::Load(std::string const &level, std::string const &difficult
                         {
                             int value = stoi(row);
                             if (!value)
-                                throw ParseException("nb_drones must contain a numeric value.");
+                                throw ParseException("nb_drones must be a numeric value.");
                             if (value <= 0)
                                 throw ParseException("nb_drones can never be negative or zero.");
                             this->nb_drones = value;

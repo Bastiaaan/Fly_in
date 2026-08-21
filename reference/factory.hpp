@@ -1,13 +1,14 @@
 #pragma once
 # include "fly_in.hpp"
 
+class Hub;
 struct Argument
 {
     std::string key;
     std::variant<int, std::optional<int>, bool, std::string, std::optional<std::string>, char, double, Hub*> value;
     Argument& operator=(Argument &&n) {
-        key = move(n.key);
-        value = move(n.value);
+        key = std::move(n.key);
+        value = std::move(n.value);
         return *this;
     }
 };

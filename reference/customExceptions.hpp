@@ -8,15 +8,20 @@ class ParseException : public std::exception
 {
 private:
     std::string errMsg;
+    FailureCause cause = FailureCause::NoErrorsGiven;
 public:
-    // ParseException(std::string const &msg, FailureCause const &c)
-    //     : errMsg("Error while parsing:\n" + msg + "\nReason: " + (c)) {}
+    ParseException(std::string const &msg, FailureCause const &c)
+        : errMsg(msg), cause(c) {}
 
     ParseException(std::string const &msg)
-        : errMsg("Error while parsing:\n" + msg) {}
+        : errMsg(msg) {}
 
     const char *what() const noexcept override
     {
+        if (cause != FailureCause::NoErrorsGiven)
+        {
+            //errTemplate += "Reason";
+        }
         return errMsg.c_str();
     }
 };

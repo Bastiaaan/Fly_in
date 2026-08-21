@@ -1,7 +1,8 @@
 
-
-#include "../../reference/validator.hpp"
+#include "factory.tpp"
 #include "validator.hpp"
+#include "hub.hpp"
+#include "system.hpp"
 
 ExecuteState Validator::saveRec(string &buffer, unsigned int line)
 {
@@ -20,19 +21,28 @@ ExecuteState Validator::saveRec(string &buffer, unsigned int line)
     }
 }
 
-ValidationResult Validator::Execute() {
+void Validator::saveError(FailureCause const &why, std::string const &msg, unsigned int line)
+{
+    std::cout << "Error while parsing;\n" << msg
+              << " at line " << line << std::endl
+              << causeToString(why) << std::endl; 
+}
+
+std::vector<FailureCause> Validator::Execute()
+{
+    ValidationResult res;
+    std::vector<FailureCause> errors;
     try
     {
-        //FailureCause cause;
-        std::cout << "checking the rules of this wretched file;" << std::endl << std::endl;
         for (auto [rule, record] : this->mapRows)
         {
             std::cout << TextFormat("rule #%d: -- %s --", rule, record.c_str()) << std::endl;
         }
-        return ValidationResult::Pass();
+        res = ValidationResult::Pass();
     }
     catch (ParseException &ex)
     {
-        return ValidationResult::Fail(FailureCause::InvalidConnection);
+        res = ValidationResult::Fail(FailureCause::InvalidConnection);
     }
+    return errors;
 }

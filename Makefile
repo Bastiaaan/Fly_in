@@ -13,7 +13,7 @@ SRCS := $(SRC_DIR)main.cpp \
       $(SRC_REF)hub.cpp \
       $(SRC_REF)map.cpp \
       $(SRC_REF)system.cpp \
-      $(SRC_REF)validator.cpp \
+	  $(SRC_REF)validator.cpp \
       $(SRC_REF)visuals.cpp
 
 # Color declarations below;
