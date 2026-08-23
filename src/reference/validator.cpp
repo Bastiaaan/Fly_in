@@ -4,7 +4,7 @@
 #include "hub.hpp"
 #include "system.hpp"
 
-ExecuteState Validator::saveRec(string &buffer, unsigned int line)
+ExecuteState Validator::saveRec(string &buffer, unsigned int const line)
 {
     try
     {
@@ -23,26 +23,22 @@ ExecuteState Validator::saveRec(string &buffer, unsigned int line)
 
 void Validator::saveError(FailureCause const &why, std::string const &msg, unsigned int line)
 {
-    std::cout << "Error while parsing;\n" << msg
-              << " at line " << line << std::endl
-              << causeToString(why) << std::endl; 
+    std::string errorTemplate = "";
+    errorTemplate += causeToString(why) + ": ";
+    errorTemplate += msg;
+    errorTemplate += line > 0 ? " at line " + std::to_string(line) : "";
+    this->errors[this->errors.size()] = errorTemplate;
 }
 
-std::vector<FailureCause> Validator::Execute()
+bool Validator::isPassed()
 {
-    ValidationResult res;
-    std::vector<FailureCause> errors;
-    try
-    {
-        for (auto [rule, record] : this->mapRows)
-        {
-            std::cout << TextFormat("rule #%d: -- %s --", rule, record.c_str()) << std::endl;
-        }
-        res = ValidationResult::Pass();
-    }
-    catch (ParseException &ex)
-    {
-        res = ValidationResult::Fail(FailureCause::InvalidConnection);
-    }
+    return this->errors.size() == 0;
+}
+
+std::vector<std::string> Validator::releaseErrors()
+{
+    std::vector<std::string> errors;
+    for (auto const &error : this->errors)
+        errors.push_back(error.second);
     return errors;
 }

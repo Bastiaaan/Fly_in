@@ -2,7 +2,7 @@
 // Created by brogaar on 2-7-26.
 //
 
-#include "../reference/fly_in.hpp"
+#include "fly_in.hpp"
 
 vector<string> split(const string &s, char delimiter, unsigned int size)
 {
@@ -36,3 +36,8 @@ string join(const vector<string>& parts, const char delimiter, const unsigned in
     return result;
 }
 
+bool isNumeric(std::string const &s)
+{
+    return !s.empty() && std::all_of(s.begin(), s.end(),
+        [](unsigned char c) { return std::isdigit(c); });
+}

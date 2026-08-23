@@ -28,4 +28,5 @@ class System;
 
 std::vector<std::string> split(const std::string &s, char delimiter, unsigned int size = 0);
 std::string join(const std::vector<std::string>& parts, char delimiter, unsigned int size = 0);
+bool isNumeric(std::string const &s);
 ExecuteState fly_in(System &sys);

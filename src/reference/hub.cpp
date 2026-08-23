@@ -94,7 +94,7 @@ void Hub::setStartOrEnd(std::string const &soe)
         else if (soe == "end")
             this->end = true;
         else
-            throw ParseException("Invalid startOrEnd");
+            throw ParseException("Invalid startOrEnd", "1");
     }
     catch (ParseException &e) {
         std::cout << e.what() << std::endl;

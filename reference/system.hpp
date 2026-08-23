@@ -16,10 +16,12 @@ struct ExecuteState
     std::any result;
     std::optional<unsigned int> line;
     std::optional<std::string> why;
-	static ExecuteState Fail(std::string const &reason, unsigned int line = -1)
+	static ExecuteState Fail(std::string const &reason, unsigned int line = 0, std::any result = std::nullopt)
 	{
 		ExecuteState s;
 		s.success = false;
+		if (result.has_value())
+			s.result = result;
 		if (line > 0)
 			s.line = line;
 		s.why = reason;

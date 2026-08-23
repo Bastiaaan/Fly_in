@@ -45,10 +45,12 @@ int main()
     auto result = system.Load(get<2>(options[chosenMap - 1]), difficulty);
     if (!result.success)
     {
-        if (!result.line.has_value())
-            std::cout << "So here's what happened: " << result.why.value() << endl;
-        else
-            std::cout << "Error while parsing: " << result.why.value() << " at line " << result.line.value() << endl;
+        std::vector<std::string> errors =
+            std::any_cast<std::vector<std::string>>(result.result);
+        std::cout << "===== Could not run simulation ======" << std::endl;
+        std::cout << "      One or more errors found;" << std::endl << std::endl;
+        for (auto error : errors)
+            std::cout << " -   " << error << std::endl;
     }
     else
     {

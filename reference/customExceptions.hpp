@@ -7,14 +7,17 @@
 class ParseException : public std::exception
 {
 private:
-    std::string errMsg;
+    std::string const errMsg;
     FailureCause cause = FailureCause::NoErrorsGiven;
+    std::string line;
 public:
-    ParseException(std::string const &msg, FailureCause const &c)
-        : errMsg(msg), cause(c) {}
+    ParseException(std::string const &msg, FailureCause const &c, std::string const &line)
+        : errMsg(msg), cause(c), line(line) {}
 
-    ParseException(std::string const &msg)
-        : errMsg(msg) {}
+    ParseException(std::string const &msg, std::string const line)
+        : errMsg(msg), line(line) {}
+
+    ParseException(std::string const &msg) : errMsg(msg) {};
 
     const char *what() const noexcept override
     {
@@ -22,7 +25,9 @@ public:
         {
             //errTemplate += "Reason";
         }
-        return errMsg.c_str();
+        const std::string errTemplate =
+            errMsg + " at line " + line + ".\n";
+        return errTemplate.c_str();
     }
 };
 

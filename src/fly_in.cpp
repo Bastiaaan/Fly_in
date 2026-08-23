@@ -11,12 +11,6 @@ ExecuteState fly_in(System &sys)
     auto const end = sys._map.getHub("goal") == nullptr ?
 					 sys._map.getHub("impossible_goal") :
 					 sys._map.getHub("goal");
-					
-    for (unsigned long i = 0; i < sys.nb_drones; i++)
-    {
-        auto *drone = new Drone(i+1);
-        sys._map.available_drones.push_back(drone);
-    }
     try
     {
         InitWindow(100, 100, "====== Fly-In ======");

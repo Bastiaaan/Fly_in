@@ -1,5 +1,6 @@
 #pragma once
 # include "fly_in.hpp"
+# include "system.hpp"
 
 class Hub;
 struct Argument
@@ -20,4 +21,5 @@ class Factory
         static C create(std::map<int, Argument> &args);
         static std::map<int, Argument> ready_args();
         static int resolveKey(std::string const &key, std::map<int, Argument> &args);
+        static std::string getVal(std::map<int, Argument> &args, const std::string &key);
 };

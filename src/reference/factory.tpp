@@ -33,15 +33,15 @@ C Factory<C>::create(map<int, Argument> &args)
     if constexpr (is_same_v<C, Hub>)
     {
         if (resolveKey("name", args) != -1)
-            _ret.setName(get<string>(args[resolveKey("name", args)].value));
+            _ret.setName(std::get<std::string>(args[resolveKey("name", args)].value));
         if (resolveKey("x", args) != -1)
-            _ret.setX(stoi(get<string>(args[resolveKey("x", args)].value)));
+            _ret.setX(stoi(std::get<std::string>(args[resolveKey("x", args)].value)));
         if (resolveKey("y", args) != -1)
-            _ret.setY(stoi(get<string>(args[resolveKey("y", args)].value)));
+            _ret.setY(stoi(std::get<std::string>(args[resolveKey("y", args)].value)));
         if (resolveKey("zone", args) != -1)
-            _ret.setZone(get<string>(args[resolveKey("zone", args)].value));
+            _ret.setZone(std::get<std::string>(args[resolveKey("zone", args)].value));
         if (resolveKey("color", args) != -1)
-            _ret.setColor(get<string>(args[resolveKey("color", args)].value));
+            _ret.setColor(std::get<std::string>(args[resolveKey("color", args)].value));
         if (resolveKey("max_drones", args) != -1
             && !get<string>(args[resolveKey("max_drones", args)].value).empty())
         {
@@ -88,4 +88,13 @@ int Factory<C>::resolveKey(const std::string &key, std::map<int, Argument> &args
         return -1;
     };
     return fromKey(key);
+}
+
+template<class C>
+std::string Factory<C>::getVal(std::map<int, Argument> &args, const std::string &key)
+{
+    int at = resolveKey(key, args);
+    if (at < 0)
+        return "";
+    return get<std::string>(args.at(at).value);
 }

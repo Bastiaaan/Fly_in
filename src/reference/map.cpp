@@ -30,6 +30,24 @@ Hub* Map::getHub(string const &hubName)
     return _find(hubName);
 }
 
+Connection* Map::getConnection(std::string const &hub1, std::string const &hub2)
+{
+    auto const _hub1 = getHub(hub1);
+    auto const _hub2 = getHub(hub2);
+
+    std::vector<Connection*> foundConnections;
+    std::copy_if(
+        this->connections.begin(),
+        this->connections.end(),
+        std::back_inserter(foundConnections),
+        [_hub1, _hub2]
+        (Connection const *conn) -> bool {
+            return conn->hub1 == _hub1 && conn->hub2 == _hub2; 
+        }
+    );
+    return foundConnections.size() == 0 ? nullptr : foundConnections[0];
+}
+
 void Map::addConnection(Connection *connection)
 {
     try
@@ -77,7 +95,6 @@ Map::~Map()
 
     for (auto hub : this->hubs)
     {
-        std::cout << "removing " << hub->name << std::endl;
         delete hub;
         hub = nullptr;
     }
