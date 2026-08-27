@@ -1,0 +1,74 @@
+{
+    "name": "02_simple_fork.txt",
+    "difficulty": "easy",
+    "nb_drones": 4,
+    "hubs": [
+        {
+            "name": "start",
+            "x": 0,
+            "y": 0,
+            "color": "green",
+            "zone": "normal",
+            "max_drones": 1
+        },
+        {
+            "name": "junction",
+            "x": 1,
+            "y": 0,
+            "color": "yellow",
+            "zone": "normal",
+            "max_drones": 2
+        },
+        {
+            "name": "path_a",
+            "x": 2,
+            "y": 1,
+            "color": "blue",
+            "zone": "normal",
+            "max_drones": 1
+        },
+        {
+            "name": "path_b",
+            "x": 2,
+            "y": -1,
+            "color": "blue",
+            "zone": "normal",
+            "max_drones": 1
+        },
+        {
+            "name": "goal",
+            "x": 3,
+            "y": 0,
+            "color": "red",
+            "zone": "normal",
+            "max_drones": 1
+        }
+    ],
+    "connections": [
+        {
+            "hub_1": "start",
+            "hub_2": "junction",
+            "max_link_capacity": 2
+        },
+        {
+            "hub_1": "junction",
+            "hub_2": "path_a",
+            "max_link_capacity": 1
+        },
+        {
+            "hub_1": "junction",
+            "hub_2": "path_b",
+            "max_link_capacity": 1
+        },
+        {
+            "hub_1": "path_a",
+            "hub_2": "goal",
+            "max_link_capacity": 1
+        },
+        {
+            "hub_1": "path_b",
+            "hub_2": "goal",
+            "max_link_capacity": 1
+        }
+    ]
+}

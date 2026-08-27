@@ -3,6 +3,7 @@ DEBUG_NAME := fly_in_debug
 
 SRC_DIR := src/
 SRC_REF := $(SRC_DIR)reference/
+PARS_REF := parser
 
 SRCS := $(SRC_DIR)main.cpp \
       $(SRC_DIR)fly_in.cpp \
@@ -36,9 +37,14 @@ LDFLAGS := -Lraylib/lib -lraylib -Wl,-rpath,./raylib/lib
 
 vpath %.cpp src src/reference
 
-.PHONY: all $(NAME) re clean fclean debug
+.PHONY: all install parser-install $(NAME) run re clean fclean debug lint
 
-all: $(NAME)
+all: install
+
+install: parser-install $(NAME)
+
+parser-install:
+	+$(MAKE) -C $(PARS_REF) install
 
 $(NAME): $(OBJ)
 	$(CC) $(OBJ) $(LDFLAGS) -o $(NAME)
@@ -58,12 +64,21 @@ $(OBJ_DEST)%.debug.o: %.cpp
 	@$(CC) $(CFLAGS_DEBUG) -c $< -o $@
 	@echo "$(DEBUG)Compiling debug: $<$(RESET)"
 
+run:
+	+$(MAKE) -C $(PARS_REF) run
+	./$(NAME)
+
 re: fclean all
+
+lint:
+	+$(MAKE) -C $(PARS_REF) lint
 
 clean:
 	@rm -rf $(OBJ_DEST)
-	@echo "cleaning obj/ folder"
+	+$(MAKE) -C $(PARS_REF) clean
+	@echo "cleaning obj/ folder and removing __pycache__"
 
 fclean: clean
 	@rm -f $(NAME) $(DEBUG_NAME)
-	@echo "full cleaning obj/ folder AND fly-in binaries"
+	+$(MAKE) -C $(PARS_REF) full_clean
+	@echo "full cleaning obj/ folder AND fly-in binaries AND removing .venv and __pycach__"

@@ -80,6 +80,7 @@ class System
         Validator *validator;
 		ExecuteState initDrones();
 		ExecuteState registerTurn();
+		ExecuteState jsonLoad();
 		const Hub& findByCoordinates(int x, int y);
         ExecuteState Load(std::string const &level, std::string const &difficulty);
         vector<tuple<int, string, string>> get_options(const std::string &difficulty);

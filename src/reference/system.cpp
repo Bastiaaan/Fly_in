@@ -74,7 +74,7 @@ ExecuteState System::mapsBasePath()
             fly_in++;
         fly_in++;
         std::string const _core = join(parts, '/', fly_in);
-        std::string const &result = _core + "/maps/";
+        std::string const &result = _core + "/parser/result/";
         return ExecuteState::Ok(result);
     }
     catch (exception &ex)
@@ -101,6 +101,27 @@ const Hub &System::findByCoordinates(int const x, const int y)
         return nullptr;
     };
     return *hub(x, y);
+}
+
+ExecuteState System::jsonLoad()
+{
+    cout << "choosing out of options..." << endl;
+    regex pattern(R"(^\d{1,2}_[a-z]+(?:_[a-z]+)*\.json$)");
+    auto const mapResult = mapsBasePath();
+    if (!mapResult.success)
+    {
+        verboseFree(mapResult);
+        return ExecuteState::Fail("noppus");
+    }
+    for (const auto& fileSrc : filesystem::directory_iterator(_core))
+    {
+        opt++;
+        std::vector<string> broken = split(fileSrc.path().string(), '/');
+        std::string fileName = broken[broken.size() - 1];
+        std::vector fileParts = split(split(fileName, '.')[0], '_');
+        fileParts.erase(fileParts.begin());
+        options.push_back({opt, join(fileParts, ' '), fileName});
+    }
 }
 
 ExecuteState System::Load(std::string const &level, std::string const &difficulty)
@@ -441,7 +462,7 @@ ExecuteState System::Load(std::string const &level, std::string const &difficult
                 con = nullptr;
             }
             if (!this->validator->isPassed())
-                throw ParseException(TextFormat("could not parse '%s'", this->_map.name));
+                throw ParseException("could not parse '" + this->_map.name + "'");
             return ExecuteState::Ok("Ok");
         }
         catch (ParseException &pex)

@@ -7,27 +7,30 @@
 class ParseException : public std::exception
 {
 private:
-    std::string const errMsg;
+    std::string errMsg;
     FailureCause cause = FailureCause::NoErrorsGiven;
     std::string line;
+    std::string formatted; // pre-built message
+
+    void buildMessage() {
+        formatted = errMsg + " at line " + line + ".\n";
+        if (cause != FailureCause::NoErrorsGiven) {
+            formatted += "Reason: " + std::to_string(static_cast<int>(cause)) + "\n";
+        }
+    }
+
 public:
     ParseException(std::string const &msg, FailureCause const &c, std::string const &line)
-        : errMsg(msg), cause(c), line(line) {}
+        : errMsg(msg), cause(c), line(line) { buildMessage(); }
 
-    ParseException(std::string const &msg, std::string const line)
-        : errMsg(msg), line(line) {}
+    ParseException(std::string const &msg, std::string const &line)
+        : errMsg(msg), line(line) { buildMessage(); }
 
-    ParseException(std::string const &msg) : errMsg(msg) {};
+    ParseException(std::string const &msg)
+        : errMsg(msg) { buildMessage(); }
 
-    const char *what() const noexcept override
-    {
-        if (cause != FailureCause::NoErrorsGiven)
-        {
-            //errTemplate += "Reason";
-        }
-        const std::string errTemplate =
-            errMsg + " at line " + line + ".\n";
-        return errTemplate.c_str();
+    const char *what() const noexcept override {
+        return formatted.c_str();
     }
 };
 
