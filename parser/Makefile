@@ -22,14 +22,17 @@ run:
 
 clean:
 	@rm -rf src/__pycache__
+	@rm -rf src/fly_in_map_parser.egg-info
+	@rm -rf .mypy_cache
 
 full_clean:
 	@rm -rf src/__pycache__ $(VENV)
+	@rm -rf src/fly_in_map_parser.egg-info
 
 lint:
 	@source $(VENV)/bin/activate
-	@flake8 .
-	@mypy . --warn-return-any \
+	@flake8 src
+	@mypy src --warn-return-any \
 		--warn-unused-ignores \
 		--ignore-missing-imports \
 		--disallow-untyped-defs \

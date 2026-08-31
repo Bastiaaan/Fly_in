@@ -3,9 +3,9 @@ from .connection import Connection
 from .customError import ParseError, ParsingError
 from .hub import Hub
 from .map import Map
-from pathlib import Path
 from json import dumps
 from typing import Any
+from pathlib import Path
 
 
 class Parser:
@@ -19,6 +19,12 @@ class Parser:
         self._map: str = "to be selected from"
 
     @staticmethod
+    def check_directory() -> None:
+        directory: Path = Path("result")
+        if not directory.exists():
+            directory.mkdir()
+
+    @staticmethod
     def parse_arg(values: list[str], caster: Any) -> Any:
         if not values:
             return ""
@@ -30,12 +36,12 @@ class Parser:
         return parsed
 
     @staticmethod
-    def parse_map(path: Path) -> Map:
+    def parse_map(path: str) -> Map | None:
         try:
             errors: list[ParseError] = []
             saved_hubs: list[Hub] = []
             saved_connections: list[Connection] = []
-            nb_drones: int = None
+            nb_drones: int = 0
             line_buffer: str
             start: int = 0
             end: int = 0
@@ -44,7 +50,7 @@ class Parser:
                 while True:
                     line_rule += 1
                     line_buffer = _fstream.readline()
-                    args: dict[str: Any] = {}
+                    args: dict[str, Any] = {}
                     if not line_buffer:
                         break
                     if '#' not in line_buffer[0] and not line_buffer == '\n':
@@ -133,9 +139,8 @@ class Parser:
                                         """duplicate hub-coordinates
                                         are not allowed"""))
                                     continue
-                                if (len(saved_hubs) > 0
-                                     and not saved_hubs[0].position
-                                    is "start"):
+                                if (len(saved_hubs) > 0 and
+                                   saved_hubs[0].position != "start"):
                                     errors.append(
                                         ParseError(
                                             line_rule,
@@ -144,9 +149,9 @@ class Parser:
                                     )
                                     continue
                                 elif (any(
-                                    hub.position == end
-                                    for hub in saved_hubs) and
-                                    not hub[-1].position is "end"):
+                                     hub.position == end
+                                     for hub in saved_hubs) and
+                                     saved_hubs[-1].position != "end"):
                                     errors.append(
                                         ParseError(
                                             line_rule,
@@ -156,8 +161,8 @@ class Parser:
                                     continue
                                 saved_hubs.append(hub)
                             elif key in "connection":
-                                values: list[str] = row.split(' ')
-                                if not len(values) < 3 or len(values) == 0:
+                                _values: list[str] = row.split(' ')
+                                if not len(_values) < 3 or len(_values) == 0:
                                     errors.append(
                                         ParseError(
                                             line_rule,
@@ -171,7 +176,7 @@ class Parser:
                                 args["hub_1"] = None
                                 args["hub_2"] = None
                                 args["max_link_capacity"] = None
-                                hubs: list[str] = values[0].split('-')
+                                hubs: list[str] = _values[0].split('-')
                                 if not len(hubs) == 2:
                                     errors.append(
                                         ParseError(
@@ -203,10 +208,10 @@ class Parser:
                                 args["hub_1"] = hubs[0]
                                 args["hub_2"] = hubs[1]
                                 if '[' in row and ']' in row:
-                                    values.pop(0)
-                                    values[0] = values[0].strip().strip("[]")
-                                    metaset: list[str] = values[0].split('=')
-                                    if not len(metaset) == 2:
+                                    _values.pop(0)
+                                    _values[0] = _values[0].strip().strip("[]")
+                                    metas: list[str] = _values[0].split('=')
+                                    if not len(metas) == 2:
                                         errors.append(
                                             ParseError(
                                                 line_rule,
@@ -214,8 +219,8 @@ class Parser:
                                             )
                                         )
                                         continue
-                                    if metaset[0] in args:
-                                        args[metaset[0]] = metaset[1]
+                                    if metas[0] in args:
+                                        args[metas[0]] = metas[1]
                                 _connection: Connection = Connection(
                                     hub1=args["hub_1"],
                                     hub2=args["hub_2"],
@@ -269,14 +274,15 @@ class Parser:
             )
         except ParsingError as err:
             print(err)
-            return None
         except ValueError as err:
             print("lil' bug detected: ", err)
         except KeyError as err:
             print("pydantic doesn't like it: ", err)
-        return False
+        return None
 
-    def prepare_output(_map: Map, diff: str, name: str) -> dict[str, Any]:
+    @staticmethod
+    def prepare_output(_map: Map,
+                       diff: str, name: str) -> dict[str, Any]:
         output: dict[str, Any] = {}
         output["name"] = name
         output["difficulty"] = diff
@@ -303,6 +309,7 @@ class Parser:
         ]
         return output
 
+    @staticmethod
     def write_output(self, data: dict[str, Any]) -> bool:
         try:
             contents: str = dumps(data, indent=4)

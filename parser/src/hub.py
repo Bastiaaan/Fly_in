@@ -12,7 +12,7 @@ class Hub(BaseModel):
     color: Optional[str] = Field(default=None)
     max_drones: Optional[int] = Field(default=None)
     zone: Optional[str] = Field(default=None)
-    position: str = Field(default=None)
+    position: Optional[str] = Field(default=None)
 
     @model_validator(mode="after")
     def validate_rules(self) -> "Hub":
