@@ -1,8 +1,9 @@
 
 en.subject.pdf
-cmake-build-debug/*
-parser/map.json
+parser/result/map.json
+parser/result/fail.json
 parser/uv.lock
+parser/src/__pycache__
 obj
 obj/*
 fly_in

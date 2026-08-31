@@ -1,4 +1,0 @@
-pydantic
-numpy
-mypy
-flake8
