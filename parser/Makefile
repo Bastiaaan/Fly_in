@@ -12,13 +12,13 @@ install:
 	@echo ".venv created"
 	@source $(VENV)/bin/activate
 	@uv pip install -e .
-	@deactivate
+	@source deactivate
 	@echo "needed dependencies installed"
 
 run:
 	@source $(VENV)/bin/activate
 	@python -m src
-	@deactivate
+	@source deactivate
 
 clean:
 	@rm -rf src/__pycache__
@@ -43,4 +43,4 @@ lint:
 debug:
 	@source $(VENV)/bin/activate
 	@python -m pdb src/__main__.py
-	@deactivate
+	@source deactivate
