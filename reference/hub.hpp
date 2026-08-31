@@ -36,9 +36,9 @@ class Hub {
         void setName(std::string const &name);
         void setX(int x);
         void setY(int y);
-        void setZone(std::optional<std::string> const &zoneName);
-        void setColor(std::optional<std::string> const &color);
-        void setMaxDrones(std::optional<int> max_drones);
+        void setZone(std::string const &zoneName);
+        void setColor(std::string const &color);
+        void setMaxDrones(int max_drones);
 		void setStartOrEnd(std::string const &soe);
 		std::vector<Log*> transferDrone(Link &connection, float hubRadius);
 		bool isStart() const;

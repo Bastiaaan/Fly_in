@@ -86,13 +86,6 @@ void Map::setSrcPath(string &path)
 
 Map::~Map()
 {
-    for (auto connection : this->connections)
-    {
-        delete connection;
-        connection = nullptr;
-    }
-    this->connections.clear();
-
     for (auto hub : this->hubs)
     {
         delete hub;

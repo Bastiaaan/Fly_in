@@ -52,37 +52,26 @@ void Hub::setY(int const y)
     this->position_y = y;
 }
 
-void Hub::setZone(std::optional<string> const &zoneName)
+void Hub::setZone(string const &zoneName)
 {
-    if (zoneName.has_value())
-    {
-        if (zoneName.value() == "restricted")
-            this->zone = Zone::Restricted;
-        else if (zoneName.value() == "blocked")
-            this->zone = Zone::Blocked;
-        else if (zoneName.value() ==  "priority")
-            this->zone = Zone::Priority;
-        else
-            this->zone = Zone::Normal;
-    }
+    if (zoneName == "restricted")
+        this->zone = Zone::Restricted;
+    else if (zoneName == "blocked")
+        this->zone = Zone::Blocked;
+    else if (zoneName ==  "priority")
+        this->zone = Zone::Priority;
+    else
+        this->zone = Zone::Normal;
 }
 
-void Hub::setColor(std::optional<std::string> const &color)
+void Hub::setColor(std::string const &color)
 {
-    if (color.has_value())
-        this->color = color.value();
-    else
-        this->color = "default";
+    this->color = color;
 }
 
-void Hub::setMaxDrones(std::optional<int> maxDrones)
+void Hub::setMaxDrones(int maxDrones)
 {
-    if (!maxDrones.has_value())
-        this->max_drones = 1;
-    else if (this->isStart() || this->isEnd())
-        this->max_drones = 50;
-    else
-        this->max_drones = maxDrones.value();
+    this->max_drones = maxDrones;
 }
 
 void Hub::setStartOrEnd(std::string const &soe)

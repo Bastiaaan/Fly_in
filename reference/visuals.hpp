@@ -1,7 +1,8 @@
 
 #pragma once
-#include "fly_in.hpp"
+
 #include <raylib.h>
+#include "fly_in.hpp"
 
 struct Line
 {

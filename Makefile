@@ -14,7 +14,6 @@ SRCS := $(SRC_DIR)main.cpp \
       $(SRC_REF)hub.cpp \
       $(SRC_REF)map.cpp \
       $(SRC_REF)system.cpp \
-	  $(SRC_REF)validator.cpp \
       $(SRC_REF)visuals.cpp
 
 # Color declarations below;
@@ -31,7 +30,7 @@ DEBUG_OBJ = $(addprefix $(OBJ_DEST),$(notdir $(SRCS:.cpp=.debug.o)))
 
 CC := c++
 CC_DEBUG := c++
-CFLAGS := -Wall -Werror -Wextra -std=c++20 -Ireference -Iraylib/include
+CFLAGS := -Wall -Werror -Wextra -std=c++20 -Ireference -Iraylib/include -Iinclude
 CFLAGS_DEBUG := $(CFLAGS) -g -O0 -DDEBUG
 LDFLAGS := -Lraylib/lib -lraylib -Wl,-rpath,./raylib/lib
 
@@ -65,6 +64,7 @@ $(OBJ_DEST)%.debug.o: %.cpp
 	@echo "$(DEBUG)Compiling debug: $<$(RESET)"
 
 run:
+	@rm -rf $(PARS_REF)/result/*
 	+$(MAKE) -C $(PARS_REF) run
 	./$(NAME)
 

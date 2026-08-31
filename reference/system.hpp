@@ -1,10 +1,8 @@
-
 #pragma once
 
 #include <any>
 #include <optional>
 #include "map.hpp"
-#include "validator.hpp"
 
 using namespace std;
 
@@ -80,10 +78,9 @@ class System
         Validator *validator;
 		ExecuteState initDrones();
 		ExecuteState registerTurn();
-		ExecuteState jsonLoad();
+		ExecuteState jsonMap();
+		ExecuteState extractMap(std::string const &path);
 		const Hub& findByCoordinates(int x, int y);
-        ExecuteState Load(std::string const &level, std::string const &difficulty);
-        vector<tuple<int, string, string>> get_options(const std::string &difficulty);
         static void verboseFree(ExecuteState const &ex);
         System();
         ~System();

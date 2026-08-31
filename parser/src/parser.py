@@ -53,7 +53,7 @@ class Parser:
                             errors.append(
                                 ParseError(
                                     line_rule,
-                                    "declaring line must only have one :"))
+                                    "declaring line with more than one ':'"))
                             continue
                         else:
                             key: str = key_row[0]
@@ -69,26 +69,31 @@ class Parser:
                                 args["color"] = None
                                 args["max_drones"] = None
                                 args["zone"] = None
+                                args["position"] = None
                                 if "start_hub" in key:
                                     start += 1
+                                    args["position"] = "start"
                                     if start > 2:
                                         errors.append(
                                             ParseError(
                                                 line_rule,
-                                                "multi start_hub not allowed"
+                                                "multi start_hub found"
                                             )
                                         )
                                         continue
-                                if "end_hub" in key:
+                                elif "end_hub" in key:
                                     end += 1
+                                    args["position"] = "end"
                                     if end > 2:
                                         errors.append(
                                             ParseError(
                                                 line_rule,
-                                                "multi end_hub not allowed"
+                                                "multi end_hub found"
                                             )
                                         )
                                         continue
+                                else:
+                                    args["position"] = "midway"
                                 if '[' in row and ']' in row:
                                     for value in values:
                                         value = value.strip().strip("[]")
@@ -97,7 +102,7 @@ class Parser:
                                             errors.append(
                                                 ParseError(
                                                     line_rule,
-                                                    "only assign once."))
+                                                    "incorrect assignment"))
                                         _key: str = metaset[0]
                                         _val: str = metaset[1]
                                         if _key in args:
@@ -108,7 +113,8 @@ class Parser:
                                     y=args["y"],
                                     color=args["color"],
                                     max_drones=args["max_drones"],
-                                    zone=args["zone"]
+                                    zone=args["zone"],
+                                    position=args["position"]
                                 )
                                 args.clear()
                                 if any(_h.name == hub.name and
@@ -126,6 +132,27 @@ class Parser:
                                         line_rule,
                                         """duplicate hub-coordinates
                                         are not allowed"""))
+                                    continue
+                                if (len(saved_hubs) > 0
+                                     and not saved_hubs[0].position
+                                    is "start"):
+                                    errors.append(
+                                        ParseError(
+                                            line_rule,
+                                            "normal hub before start_hub"
+                                        )
+                                    )
+                                    continue
+                                elif (any(
+                                    hub.position == end
+                                    for hub in saved_hubs) and
+                                    not hub[-1].position is "end"):
+                                    errors.append(
+                                        ParseError(
+                                            line_rule,
+                                            "normal hub after end_hub"
+                                        )
+                                    )
                                     continue
                                 saved_hubs.append(hub)
                             elif key in "connection":
@@ -261,7 +288,8 @@ class Parser:
                 "y": hub.y,
                 "color": hub.color,
                 "zone": hub.zone,
-                "max_drones": hub.max_drones
+                "max_drones": hub.max_drones,
+                "position": hub.position
             }
             for hub in _map.hubs
         ]

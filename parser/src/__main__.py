@@ -20,8 +20,9 @@ def main() -> None:
     _map: Map = Parser.parse_map(target_path)
     if _map is None:
         Parser.write_output_fail()
-    _json: dict[str, Any] = Parser.prepare_output(_map, diff, files[mapNum-1])
-    Parser.write_output(Parser, _json)
+    else:
+        _json: dict[str, Any] = Parser.prepare_output(_map, diff, formatted[mapNum])
+        Parser.write_output(Parser, _json)
 
 
 if __name__ == "__main__":

@@ -47,12 +47,6 @@ int Algorithm::rotateDrones(System &sys, float const hubRadius)
 					   std::pair<Link *, std::tuple<int, int>> conn2) -> bool
                     { return get<0>(conn1.second) < get<0>(conn2.second); })->second);
 
-                // int leastSteps = 
-				// get<1>(std::min_element(candidates.begin(), candidates.end(),
-                //     [](std::pair<Link *, std::tuple<int, int>> conn1,
-				// 	   std::pair<Link *, std::tuple<int, int>> conn2) -> bool
-                //     { return get<1>(conn1.second) < get<1>(conn2.second); })->second);
-
                 std::vector<pair<Link *, std::tuple<int, int>>> selected;
                 std::copy_if(candidates.begin(), candidates.end(),
 				std::back_inserter(selected),

@@ -9,60 +9,28 @@ int main()
 	try
 	{
 		System system = System();
-    	// string difficulty;
-    	// int input;
-    	// std::cout << "============ Choose a difficulty ============" << endl;
-    	// std::cout << "easy (1), medium (2), hard (3), challenger(4)" << endl;
-    	// std::cin >> input;
-    	// switch (input)
-    	// {
-    	//     case 1:
-    	//         difficulty = "easy";
-    	//         break;
-    	//     case 2:
-    	//         difficulty = "medium";
-    	//         break;
-    	//     case 3:
-    	//         difficulty = "hard";
-    	//         break;
-    	//     case 4:
-    	//         difficulty = "challenger";
-    	//         break;
-    	//     default:
-    	//         difficulty = "error";
-    	//         throw invalid_argument("invalid input.");
-    	// }
-    	// vector<tuple<int, string, string>> options = system.get_options(difficulty);
-    	// std::cout << "=========== Choose a map " << '(' << difficulty << ')' << " ===========" << endl;
-    	// for (auto &option : options)
-    	//     std::cout << get<0>(option) << ": " << get<1>(option) << endl;
-    	// int chosenMap;
-    	// std::cin >> chosenMap;
-    	// if (chosenMap < get<0>(options[0]) ||
-    	//     chosenMap > get<0>(options[options.size() - 1]))
-    	// {
-    	//     std::cout << "Invalid choice (" << chosenMap << "). try again" << endl;
-    	//     return 1;
-    	// }
-    	// auto result = system.Load(get<2>(options[chosenMap - 1]), difficulty);
-    	// if (!result.success)
-    	// {
-    	//     std::vector<std::string> errors =
-    	//         std::any_cast<std::vector<std::string>>(result.result);
-    	//     std::cout << "===== Could not run simulation ======" << std::endl;
-    	//     std::cout << "      One or more errors found;" << std::endl << std::endl;
-    	//     for (auto error : errors)
-    	//         std::cout << " -   " << error << std::endl;
-    	// }
-    	// else
-    	// {
-    	//     system._map.setName(get<1>(options[chosenMap - 1]));
-    	//     system._map.difficulty = difficulty;
-    	//     auto droneRes = system.initDrones();
-    	//     auto algoResult = fly_in(system);
-		// 	if (!algoResult.success)
-		// 		throw AlgoException("Simulation failed");
-    	// }
+    	auto _json = system.jsonMap();
+        if (!_json.success)
+        {
+            std::cerr << _json.why.value() << std::endl;
+            std::cerr << "could not execute the simulator\nExiting (1)" << std::endl;
+            return 1;
+        }
+        std::string file = std::any_cast<std::string>(_json.result);
+        if (std::any_cast<std::string>(_json.result) == "fail.json")
+        {
+            std::cerr << "something went wrong during parsing\nExiting (2)" << std::endl;
+            return 2;
+        }
+        ExecuteState loadRes = system.extractMap(file);
+        if (!loadRes.success)
+            throw std::logic_error(loadRes.why.value());
+        auto init = system.initDrones();
+        if (!init.success)
+            throw AlgoException("something went wrong with drone-init");
+        auto flied_in = fly_in(system);
+        if (!flied_in.success)
+            throw AlgoException("Fly-in failed");
 		return 0;
 	}
 	catch(const AlgoException& ex)

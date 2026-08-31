@@ -18,6 +18,6 @@ class Connection
         ~Connection() = default;
         void setHub1(Hub *hub1);
         void setHub2(Hub *hub2);
-        void setMlc(std::optional<int> max_link_capacity);
+        void setMlc(int max_link_capacity);
         ExecuteState validate_connection(Map &map) const;
 };

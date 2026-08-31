@@ -147,7 +147,7 @@ void Renderer::renderHubs(System &sys, MeasureBank &sizes)
         auto hubLoc = Renderer::locateHub(*hub, sizes.lines);
         hub->location = hubLoc;
 
-        float radius = 90;
+        float radius = sizes.screenWidth / 40;
         int fontSize = 25;
         if (sys._map.difficulty == "easy") radius = static_cast<float>(sizes.screenWidth / 31), fontSize = 50;
         if (sys._map.difficulty == "medium") radius = static_cast<float>(sizes.screenWidth / 34), fontSize = 40;

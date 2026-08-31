@@ -17,9 +17,7 @@
 #include "connection.hpp"
 #include "drone.hpp"
 #include "hub.hpp"
-#include "factory.hpp"
 #include "map.hpp"
-#include "validator.hpp"
 #include "system.hpp"
 
 static std::mt19937 rng(std::random_device{}());

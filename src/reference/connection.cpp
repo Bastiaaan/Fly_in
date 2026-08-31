@@ -14,10 +14,9 @@ void Connection::setHub2(Hub *hub2)
     this->hub2 = hub2;
 }
 
-void Connection::setMlc(std::optional<int> _max_link_capacity)
+void Connection::setMlc(int _max_link_capacity)
 {
-    this->max_link_capacity = _max_link_capacity.has_value()
-        ? _max_link_capacity.value() : 1;
+    this->max_link_capacity = _max_link_capacity;
 }
 
 void Connection::establish() const

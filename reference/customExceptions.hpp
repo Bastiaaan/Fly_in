@@ -2,27 +2,21 @@
 #include <exception>
 #include <optional>
 #include <string>
-#include "validator.hpp"
 
 class ParseException : public std::exception
 {
 private:
     std::string errMsg;
-    FailureCause cause = FailureCause::NoErrorsGiven;
     std::string line;
     std::string formatted; // pre-built message
 
     void buildMessage() {
-        formatted = errMsg + " at line " + line + ".\n";
-        if (cause != FailureCause::NoErrorsGiven) {
-            formatted += "Reason: " + std::to_string(static_cast<int>(cause)) + "\n";
-        }
+        formatted = line.empty()
+            ? errMsg + "\n"
+            : errMsg + " at line " + line + ".\n";
     }
 
 public:
-    ParseException(std::string const &msg, FailureCause const &c, std::string const &line)
-        : errMsg(msg), cause(c), line(line) { buildMessage(); }
-
     ParseException(std::string const &msg, std::string const &line)
         : errMsg(msg), line(line) { buildMessage(); }
 

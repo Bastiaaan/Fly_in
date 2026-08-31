@@ -6,7 +6,6 @@
 
 class Connection;
 
-
 class Map {
     std::string srcPath;
 	public:
