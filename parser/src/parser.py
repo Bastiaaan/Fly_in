@@ -8,15 +8,21 @@ from typing import Any
 from pathlib import Path
 
 
+def enclosures(row: str) -> int:
+    enclosure: int = 0
+    for i in range(len(row)):
+        if row[i] == '[':
+            enclosure += 1
+        elif row[i] == ']':
+            enclosure -= 1
+    return enclosure
+
+
 class Parser:
     """The object who does the reading of the /maps-folder"""
 
     __target: str = "../result/map.json"
     __target_invalid: str = "../result/fail.json"
-
-    def __init__(self) -> None:
-        self._difficulty: str = "to be decided"
-        self._map: str = "to be selected from"
 
     @staticmethod
     def check_directory() -> None:
@@ -65,6 +71,21 @@ class Parser:
                             key: str = key_row[0]
                             row: str = key_row[1]
                             row = row.strip().strip('\n')
+                            if not enclosures(row) == 0:
+                                if enclosures(row) > 0:
+                                    errors.append(
+                                        ParseError(
+                                            line_rule,
+                                            "missing meta enclosure"
+                                        )
+                                    )
+                                else:
+                                    errors.append(
+                                        ParseError(
+                                            line_rule,
+                                            "missing meta opening"
+                                        )
+                                    )
                             if ("hub" in key or
                                 "start_hub" in key or
                                "end_hub" in key):
@@ -83,7 +104,8 @@ class Parser:
                                         errors.append(
                                             ParseError(
                                                 line_rule,
-                                                "multi start_hub found"
+                                                "multiple"
+                                                " start_hubs found"
                                             )
                                         )
                                         continue
@@ -94,7 +116,8 @@ class Parser:
                                         errors.append(
                                             ParseError(
                                                 line_rule,
-                                                "multi end_hub found"
+                                                "multiple "
+                                                "end_hubs found"
                                             )
                                         )
                                         continue
@@ -113,6 +136,13 @@ class Parser:
                                         _val: str = metaset[1]
                                         if _key in args:
                                             args[_key] = _val
+                                        else:
+                                            errors.append(
+                                                ParseError(
+                                                    line_rule,
+                                                    f"unknown field '{_key}'"
+                                                )
+                                            )
                                 hub: Hub = Hub(
                                     name=args["name"],
                                     x=args["x"],
@@ -122,23 +152,24 @@ class Parser:
                                     zone=args["zone"],
                                     position=args["position"]
                                 )
+                                saved_hubs.append(hub)
                                 args.clear()
                                 if any(_h.name == hub.name and
                                        not _h == hub for _h in saved_hubs):
                                     errors.append(
                                         ParseError(
                                             line_rule,
-                                            """duplicate hub-names
-                                            are not allowed"""))
-                                    continue
-                                elif any(_h.x == hub.x and
-                                         _h.y == hub.y and not
-                                         _h == hub for _h in saved_hubs):
+                                            "duplicate hub-name found"
+                                        )
+                                    )
+                                if any(_h.x == hub.x and
+                                       _h.y == hub.y and
+                                       _h is not hub for _h in saved_hubs):
                                     errors.append(ParseError(
                                         line_rule,
-                                        """duplicate hub-coordinates
-                                        are not allowed"""))
-                                    continue
+                                        "duplicate hub-coordinates found"
+                                        )
+                                        )
                                 if (len(saved_hubs) > 0 and
                                    saved_hubs[0].position != "start"):
                                     errors.append(
@@ -147,32 +178,28 @@ class Parser:
                                             "normal hub before start_hub"
                                         )
                                     )
-                                    continue
-                                elif (any(
-                                     hub.position == end
-                                     for hub in saved_hubs) and
-                                     saved_hubs[-1].position != "end"):
+                                if (any(
+                                   h.position == "end"
+                                   for h in saved_hubs) and
+                                   saved_hubs[-1].position != "end"):
                                     errors.append(
                                         ParseError(
                                             line_rule,
                                             "normal hub after end_hub"
                                         )
                                     )
-                                    continue
-                                saved_hubs.append(hub)
                             elif key in "connection":
                                 _values: list[str] = row.split(' ')
                                 if not len(_values) < 3 or len(_values) == 0:
                                     errors.append(
                                         ParseError(
                                             line_rule,
-                                            """invalid connection rule.
-                                            A valid example:
-                                            connection: hub1-hub2
-                                            [max_link_capacity=4]"""
+                                            "invalid connection rule."
+                                            " A valid example:"
+                                            " connection: hub1-hub2"
+                                            " [max_link_capacity=4]"
                                         )
                                     )
-                                    continue
                                 args["hub_1"] = None
                                 args["hub_2"] = None
                                 args["max_link_capacity"] = None
@@ -181,9 +208,8 @@ class Parser:
                                     errors.append(
                                         ParseError(
                                             line_rule,
-                                            """A valid connection only
-                                               consists out of two hubs"""))
-                                    continue
+                                            "A valid connection only "
+                                            "consists out of two hubs"))
                                 if ((not any(_h.name == hubs[0]
                                     for _h in saved_hubs)) or
                                     (not any(_h.name == hubs[1]
@@ -204,7 +230,6 @@ class Parser:
                                                 f"non-existent hub '{hubs[1]}'"
                                             )
                                         )
-                                    continue
                                 args["hub_1"] = hubs[0]
                                 args["hub_2"] = hubs[1]
                                 if '[' in row and ']' in row:
@@ -218,7 +243,6 @@ class Parser:
                                                 "incorrect alignment found"
                                             )
                                         )
-                                        continue
                                     if metas[0] in args:
                                         args[metas[0]] = metas[1]
                                 _connection: Connection = Connection(
@@ -226,18 +250,17 @@ class Parser:
                                     hub2=args["hub_2"],
                                     max_link_capacity=args["max_link_capacity"]
                                 )
-                                if any([connection != _connection and
+                                if any(connection is not _connection and
                                         connection.hub1 == _connection.hub1 and
                                         connection.hub2 == _connection.hub2
-                                        for connection in saved_connections]):
+                                        for connection in saved_connections):
                                     errors.append(
                                         ParseError(
                                             line_rule,
-                                            f"""duplicate connection
-                                                found [{hubs[0]}-{hubs[1]}]"""
+                                            "duplicate connection "
+                                            f"[{hubs[0]}-{hubs[1]}]"
                                         )
                                     )
-                                    continue
                                 saved_connections.append(_connection)
                             elif key in "nb_drones":
                                 if not row.isdigit():
@@ -247,7 +270,7 @@ class Parser:
                                             "nb_drones is not numeric"
                                         )
                                     )
-                                    nb_drones = 0
+                                    nb_drones = -1
                                     continue
                                 elif row.isdigit() and int(row) < 1:
                                     errors.append(
@@ -259,21 +282,22 @@ class Parser:
                                     )
                                     continue
                                 nb_drones = int(row)
-            if nb_drones is None:
+            if nb_drones == 0:
                 errors.append(ParseError(None, "nb_drones is required"))
             if start < 1:
                 errors.append(ParseError(None, "a start_hub is required"))
             if end < 1:
                 errors.append(ParseError(None, "an end_hub is required"))
             if not len(errors) == 0:
-                raise ParsingError(f"could not parse map {path}", errors)
+                raise ParsingError(
+                    f"\n\n{60*'='}\ncould not parse map {path}:", errors)
             return Map(
                 nb_drones=nb_drones,
                 hubs=saved_hubs,
                 connections=saved_connections
             )
         except ParsingError as err:
-            print(err)
+            print(f"{err}\n{60*'='}\n\n")
         except ValueError as err:
             print("lil' bug detected: ", err)
         except KeyError as err:

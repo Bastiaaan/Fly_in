@@ -132,7 +132,9 @@ This removes the compiled outputs, the executable, the parser virtual environmen
 ## Resources
 
 - 42 curriculum subject and project guidelines
-- C++ reference documentation
+- for C++: mostly google to find out why things don't work
+- w3schools.com for visualization of C++ code (about some techniques)
+- GeeksforGeeks.com for documentations and tutorials
 - Python documentation and standard library references
 - JSON serialization and parsing references
 - Pathfinding and graph traversal tutorials

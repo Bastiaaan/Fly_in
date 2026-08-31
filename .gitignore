@@ -1,4 +1,5 @@
 
+.vscode
 parser/result
 parser/result/*
 parser/uv.lock
@@ -6,6 +7,7 @@ parser/.venv
 parser/src/__pycache__
 parser/src/fly_in_map_parser.egg-info
 parser/.mypy_cache
+en.subject.pdf
 obj
 fly_in
 fly_in_debug
