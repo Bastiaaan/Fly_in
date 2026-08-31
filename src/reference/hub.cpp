@@ -32,8 +32,8 @@ Hub::~Hub()
 		{
 			delete link;
 			link = nullptr;
-			this->connections.erase(name);
 		}
+		this->connections.clear();
 	}
 }
 

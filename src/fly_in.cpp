@@ -26,8 +26,9 @@ ExecuteState fly_in(System &sys)
         checkList.insert({"vertical_lines", false});
         checkList.insert({"horizontal_lines", false});
         checkList.insert({"connecting_hubs", false});
-		for (unsigned int n = 0; n < 10; n++)
+		for (unsigned int n = 0; n < 2; n++)
 			std::cout << std::endl;
+		std::cout << "========== begin Simulation ==========" << std::endl << std::endl;
         while(!WindowShouldClose() || end->drones.size() != sys.nb_drones)
         {
             BeginDrawing();
@@ -59,6 +60,9 @@ ExecuteState fly_in(System &sys)
 						sizes.startActionRadius_y + 40, 50, LIME);
             		EndDrawing();
                     WaitTime(1.5);
+					std::cout << std::endl << "========== end Simulation ==========";
+					for (unsigned int n = 0; n < 3; n++)
+						std::cout << std::endl;
 					CloseWindow();
 				}
             }

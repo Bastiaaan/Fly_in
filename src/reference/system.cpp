@@ -69,15 +69,14 @@ ExecuteState System::mapsBasePath()
 {
     try
     {
-        std::string const currentPath = filesystem::current_path().string();
-        vector<std::string> const parts = split(currentPath, '/');
-        unsigned int fly_in = 0;
-        while (parts[fly_in] != "fly_in")
-            fly_in++;
-        fly_in++;
-        std::string const _core = join(parts, '/', fly_in);
-        std::string const &result = _core + "/parser/result/";
-        return ExecuteState::Ok(result);
+        std::filesystem::path current = std::filesystem::current_path();
+        while(!std::filesystem::exists(current / "parser" / "result"))
+		{
+			if (!current.has_parent_path() || current == current.parent_path())
+				return ExecuteState::Fail("couldn't find 'parser/result' directory");
+			current = current.parent_path();
+		}
+        return ExecuteState::Ok((current / "parser" / "result" / "").string());
     }
     catch (exception &ex)
     {
@@ -218,7 +217,6 @@ ExecuteState System::initDrones()
             throw logic_error("Start hub was not found");
         for (unsigned int id = 0; id < this->nb_drones; id++)
         {
-            std::cout << "Installing drone #" << id + 1 << std::endl;
             auto *drone = new Drone(id + 1);
             start->drones.push_back(drone);
         }
