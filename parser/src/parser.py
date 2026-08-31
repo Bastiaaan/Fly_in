@@ -334,16 +334,14 @@ class Parser:
         return output
 
     @staticmethod
-    def write_output(self, data: dict[str, Any]) -> bool:
+    def write_output(data: dict[str, Any]) -> None:
         try:
             contents: str = dumps(data, indent=4)
             with open("result/map.json", "w", encoding="utf-8") as file:
                 file.write(contents)
-            return not len(self.__target) == 0
         except (FileNotFoundError,
                 PermissionError, OSError, TypeError, ValueError) as err:
             print(err)
-            return False
 
     @staticmethod
     def write_output_fail() -> None:

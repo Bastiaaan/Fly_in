@@ -23,7 +23,7 @@ def main() -> None:
     else:
         _json: dict[str, Any] = Parser.prepare_output(
             _map, diff, formatted[mapNum])
-        Parser.write_output(Parser, _json)
+        Parser.write_output(_json)
 
 
 if __name__ == "__main__":

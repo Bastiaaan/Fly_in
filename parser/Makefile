@@ -28,6 +28,7 @@ clean:
 full_clean:
 	@rm -rf src/__pycache__ $(VENV)
 	@rm -rf src/fly_in_map_parser.egg-info
+	@rm -rf .mypy_cache
 
 lint:
 	@source $(VENV)/bin/activate
