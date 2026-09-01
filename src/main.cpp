@@ -19,7 +19,7 @@ int main()
         std::string file = std::any_cast<std::string>(_json.result);
         if (std::any_cast<std::string>(_json.result) == "fail.json")
         {
-            std::cerr << "something went wrong during parsing\nExiting (2)" << std::endl;
+            std::cerr << "could not execute the simulator\nExiting (2)" << std::endl;
             return 2;
         }
         ExecuteState loadRes = system.extractMap(file);

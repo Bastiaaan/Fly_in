@@ -19,4 +19,6 @@ class Connection(BaseModel):
 
         if self.max_link_capacity is None:
             self.max_link_capacity = 1
+        elif self.max_link_capacity < 0:
+            raise ValueError("max_link_capacity cannot be negative")
         return self

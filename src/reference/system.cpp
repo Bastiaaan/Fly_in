@@ -158,6 +158,8 @@ ExecuteState System::extractMap(std::string const &file)
             throw ParseException("Could not fetch " + (base + file));
         data >> json;
         this->nb_drones = json["nb_drones"];
+		this->difficulty = json["difficulty"];
+		this->_map.difficulty = json["difficulty"];
         this->_map.name = json["name"];
         for (auto _hub : json["hubs"])
         {

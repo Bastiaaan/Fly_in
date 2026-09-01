@@ -8,12 +8,16 @@
 
 ExecuteState fly_in(System &sys)
 {
-    auto const end = sys._map.getHub("goal") == nullptr ?
-					 sys._map.getHub("impossible_goal") :
-					 sys._map.getHub("goal");
     try
     {
-        InitWindow(100, 100, "====== Fly-In ======");
+    	auto const it = std::find_if(
+    		sys._map.hubs.begin(),
+    		sys._map.hubs.end(),
+    		[](Hub const *hub) { return hub->isEnd(); }
+		);
+		Hub const *end = (it != sys._map.hubs.end()) ? *it : nullptr;
+
+        InitWindow(100, 100, "========== Fly-In ==========");
         auto sizes = MeasureBank::Init(sys._map);
         SetWindowSize(sizes.screenWidth, sizes.screenHeight);
         SetWindowPosition(
@@ -29,7 +33,7 @@ ExecuteState fly_in(System &sys)
 		for (unsigned int n = 0; n < 2; n++)
 			std::cout << std::endl;
 		std::cout << "========== begin Simulation ==========" << std::endl << std::endl;
-        while(!WindowShouldClose() || end->drones.size() != sys.nb_drones)
+        while(!WindowShouldClose() || end ->drones.size() != sys.nb_drones)
         {
             BeginDrawing();
             Renderer::renderBackground(sys, sizes);
@@ -40,7 +44,22 @@ ExecuteState fly_in(System &sys)
             if (Algorithm::noDroneFlies(sys) &&
 				end->drones.size() != sys.nb_drones)
 			{
-                sys.turn += Algorithm::rotateDrones(sys, sizes.hubRadius.x);
+				int rotate = Algorithm::rotateDrones(sys, sizes.hubRadius.x);
+				if (rotate == 0)
+				{
+					DrawText(
+						"Simulation got stuck, quiting soon :(",
+						sizes.screenWidth / 2 - 500,
+						sizes.startActionRadius_y + 40, 50, RED);
+                    WaitTime(1.5);
+            		EndDrawing();
+					std::cout << std::endl << "========== end Simulation ==========";
+					for (unsigned int n = 0; n < 3; n++)
+						std::cout << std::endl;
+					CloseWindow();
+					break;
+				}
+                sys.turn += rotate;
 				sys.verboseLog(sys.logs.size());
 			}
             else
@@ -76,3 +95,15 @@ ExecuteState fly_in(System &sys)
         return ExecuteState::Fail(ex.what());
     }
 }
+
+/*
+Please ask the reviewee to add a simple modification to their drone simulation program.
+Ask them to add a "--capacity-info" flag that displays capacity information during simulation,
+such as "Zone X: Y/Z drones, Connection A-B: Y/Z capacity used" for each turn.
+
+For example, "./main.py --capacity-info map.txt" should output the normal simulation plus
+capacity usage information. The reviewee should be able to locate the relevant
+parsing and output code, make the necessary modifications, and demonstrate that it works
+with a test case. The entire task, including the demonstration, should take no more
+than 10 minutes. Was this procedure followed and did everything work correctly?
+*/

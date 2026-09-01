@@ -46,6 +46,12 @@ int Algorithm::rotateDrones(System &sys, float const hubRadius)
                     [](std::pair<Link *, std::tuple<int, int>> conn1,
 					   std::pair<Link *, std::tuple<int, int>> conn2) -> bool
                     { return get<0>(conn1.second) < get<0>(conn2.second); })->second);
+				
+				int leastStep =
+				get<1>(std::min_element(candidates.begin(), candidates.end(),
+					[](std::pair<Link *, std::tuple<int, int>> conn1,
+					   std::pair<Link *, std::tuple<int, int>> conn2) -> bool
+					{ return get<1>(conn1.second) < get<1>(conn2.second); })->second);
 
                 std::vector<pair<Link *, std::tuple<int, int>>> selected;
                 std::copy_if(candidates.begin(), candidates.end(),
@@ -53,12 +59,21 @@ int Algorithm::rotateDrones(System &sys, float const hubRadius)
                     [lowestCost](const std::pair<Link *, std::tuple<int, int>>& record) -> bool {
                     return get<0>(record.second) == lowestCost;
                 });
-
 				turn = std::any_of(selected.begin(), selected.end(),
 					[](std::pair<Link *, std::tuple<int, int>> &row) -> bool {
 						return row.first->hub->zone == Restricted; 
 					}) ? 2 : 1;
 
+				if (std::all_of(selected.begin(), selected.end(),
+					[lowestCost](std::pair<Link *, std::tuple<int, int>> const &row) -> bool {
+						return get<0>(row.second) == lowestCost;
+					}) && _hub->drones.size() == 1) // this should only apply if the current zone has only one drone
+				{
+					selected.erase(std::remove_if(selected.begin(), selected.end(),
+						[leastStep](std::pair<Link *, std::tuple<int, int>> const &row) -> bool {
+							return get<1>(row.second) != leastStep;
+						}), selected.end());
+				}
                 for (auto [link, cost] : selected)
                 {
                     auto _logs = _hub->transferDrone(*link, hubRadius);
@@ -67,8 +82,15 @@ int Algorithm::rotateDrones(System &sys, float const hubRadius)
                 }
 				rotations.push_back(turn);
             }
+			else
+				rotations.push_back(0);
         }
     }
+
+	if (std::all_of(rotations.begin(), rotations.end(),
+		[](int const &rot) -> bool { return rot == 0; }))
+		return 0;
+
 	sys.logs[sys.logs.size() + 1] = logs;
     return std::any_of(rotations.begin(), rotations.end(),
 		[](int &rec) -> bool { return rec == 2; }) ? 2 : 1;
@@ -81,7 +103,12 @@ int Algorithm::untilTheEnd(Hub const &origin, Hub const &hub)
     int const steps = !result ? 2147483647 : visited->size();
 
     if (steps == 2147483647)
-        return steps;
+		return steps;
+
+	if (std::any_of(visited->begin(),
+		visited->end(), [](Hub const *_h) -> bool {
+		return _h->zone == Blocked; }))
+		return 2147483647;
 
     auto totalCost = [&visited]() -> int
     {
@@ -140,8 +167,6 @@ std::map<Link *, std::tuple<int, int>> Algorithm::getConnectionCosts(Hub const &
             cost += 6;
         else if (connection->hub->zone == Priority)
             cost += 0;
-        else if (connection->hub->zone == Blocked)
-            cost += 9;
         else
             cost += 3;
 		if (space < 1)
@@ -152,6 +177,8 @@ std::map<Link *, std::tuple<int, int>> Algorithm::getConnectionCosts(Hub const &
             cost += 5;
         else
             cost -= nextHub->max_drones;
+		if (cost < 0)
+			cost = 0;
         if (steps != 2147483647)
             costs.insert({connection, {cost, steps}});
     }

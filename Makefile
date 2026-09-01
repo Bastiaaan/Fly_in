@@ -74,7 +74,7 @@ lint:
 	+$(MAKE) -C $(PARS_REF) lint
 
 clean:
-	@rm -rf $(OBJ_DEST)
+	@rm -rf $(OBJ_DEST) $(DEBUG_OBJ)
 	+$(MAKE) -C $(PARS_REF) clean
 	@echo "cleaning obj/ folder and removing __pycache__"
 

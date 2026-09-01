@@ -5,6 +5,7 @@ from .hub import Hub
 from .map import Map
 from json import dumps
 from typing import Any
+from pydantic import ValidationError
 from pathlib import Path
 
 
@@ -49,8 +50,6 @@ class Parser:
             saved_connections: list[Connection] = []
             nb_drones: int = 0
             line_buffer: str
-            start: int = 0
-            end: int = 0
             line_rule: int = 0
             with open(path, 'r') as _fstream:
                 while True:
@@ -71,6 +70,9 @@ class Parser:
                             key: str = key_row[0]
                             row: str = key_row[1]
                             row = row.strip().strip('\n')
+                            if '#' in row:
+                                row = row[:row.index('#')]
+                            row.strip()
                             if not enclosures(row) == 0:
                                 if enclosures(row) > 0:
                                     errors.append(
@@ -98,36 +100,24 @@ class Parser:
                                 args["zone"] = None
                                 args["position"] = None
                                 if "start_hub" in key:
-                                    start += 1
                                     args["position"] = "start"
-                                    if start > 2:
-                                        errors.append(
-                                            ParseError(
-                                                line_rule,
-                                                "multiple"
-                                                " start_hubs found"
-                                            )
-                                        )
-                                        continue
                                 elif "end_hub" in key:
-                                    end += 1
                                     args["position"] = "end"
-                                    if end > 2:
-                                        errors.append(
-                                            ParseError(
-                                                line_rule,
-                                                "multiple "
-                                                "end_hubs found"
-                                            )
-                                        )
-                                        continue
                                 else:
                                     args["position"] = "midway"
                                 if '[' in row and ']' in row:
                                     for value in values:
                                         value = value.strip().strip("[]")
                                         metaset: list[str] = value.split('=')
-                                        if not len(metaset) == 2:
+                                        if len(metaset) < 2:
+                                            errors.append(
+                                                ParseError(
+                                                    line_rule,
+                                                    "no meta data given"
+                                                )
+                                            )
+                                            continue
+                                        elif not len(metaset) == 2:
                                             errors.append(
                                                 ParseError(
                                                     line_rule,
@@ -154,6 +144,26 @@ class Parser:
                                 )
                                 saved_hubs.append(hub)
                                 args.clear()
+                                if (sum(h.position == "start"
+                                    for h in saved_hubs) > 1 and
+                                   hub.position == "start"):
+                                    errors.append(
+                                        ParseError(
+                                            line_rule,
+                                            "multiple"
+                                            " start_hub found"
+                                        )
+                                    )
+                                if (sum(h.position == "end"
+                                    for h in saved_hubs) > 1 and
+                                   hub.position == "end"):
+                                    errors.append(
+                                        ParseError(
+                                            line_rule,
+                                            "multiple "
+                                            "end_hubs found"
+                                        )
+                                    )
                                 if any(_h.name == hub.name and
                                        not _h == hub for _h in saved_hubs):
                                     errors.append(
@@ -236,7 +246,15 @@ class Parser:
                                     _values.pop(0)
                                     _values[0] = _values[0].strip().strip("[]")
                                     metas: list[str] = _values[0].split('=')
-                                    if not len(metas) == 2:
+                                    if len(metas) < 2:
+                                        errors.append(
+                                            ParseError(
+                                                line_rule,
+                                                "no meta data given"
+                                            )
+                                        )
+                                        continue
+                                    elif not len(metas) == 2:
                                         errors.append(
                                             ParseError(
                                                 line_rule,
@@ -251,8 +269,10 @@ class Parser:
                                     max_link_capacity=args["max_link_capacity"]
                                 )
                                 if any(connection is not _connection and
-                                        connection.hub1 == _connection.hub1 and
-                                        connection.hub2 == _connection.hub2
+                                       (connection.hub1 == _connection.hub1 and
+                                        connection.hub2 == _connection.hub2) or
+                                       (connection.hub1 == _connection.hub2 and
+                                        connection.hub2 == _connection.hub1)
                                         for connection in saved_connections):
                                     errors.append(
                                         ParseError(
@@ -276,17 +296,17 @@ class Parser:
                                     errors.append(
                                         ParseError(
                                             line_rule,
-                                            """nb_drones needs to
-                                            be higher than zero"""
+                                            "nb_drones needs to"
+                                            " be higher than zero"
                                         )
                                     )
                                     continue
                                 nb_drones = int(row)
             if nb_drones == 0:
                 errors.append(ParseError(None, "nb_drones is required"))
-            if start < 1:
+            if sum(h.position == "start" for h in saved_hubs) == 0:
                 errors.append(ParseError(None, "a start_hub is required"))
-            if end < 1:
+            if sum(h.position == "end" for h in saved_hubs) == 0:
                 errors.append(ParseError(None, "an end_hub is required"))
             if not len(errors) == 0:
                 raise ParsingError(
@@ -298,6 +318,9 @@ class Parser:
             )
         except ParsingError as err:
             print(f"{err}\n{60*'='}\n\n")
+        except ValidationError as errs:
+            for err in errs.errors():
+                print(f"- {err['msg']}")
         except ValueError as err:
             print("lil' bug detected: ", err)
         except KeyError as err:
