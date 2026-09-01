@@ -4,11 +4,12 @@
 
 using namespace std;
 
-int main()
+int main(int argc, char *argv[])
 {
 	try
 	{
 		System system = System();
+		system.processArgs(argc, argv);
     	auto _json = system.jsonMap();
         if (!_json.success)
         {

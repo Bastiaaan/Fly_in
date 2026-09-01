@@ -199,29 +199,12 @@ unsigned int Algorithm::droneLimit(Hub const *hub, Link const &connection)
 {
     unsigned int drones = static_cast<unsigned int>(hub->drones.size());
     unsigned int nextDrones = static_cast<unsigned int>(connection.hub->drones.size());
+	unsigned int hubSpace = connection.hub->max_drones - nextDrones;
 
-    if (connection.hub->max_drones > 1 || connection.max_link_capacity > 1)
-    {
-        if (connection.hub->max_drones > 1)
-        {
-            if (nextDrones != 0)
-            {
-                if (nextDrones == connection.hub->max_drones)
-                    return 0;
-                if (nextDrones < connection.hub->max_drones)
-                    return connection.hub->max_drones - nextDrones;
-            }
-            else
-            {
-                return drones >= connection.hub->max_drones ?
-                     connection.hub->max_drones : drones;
-            }
-        }
-        if (connection.max_link_capacity > 1)
-            return drones >= connection.max_link_capacity ?
-            connection.max_link_capacity : drones;
-    }
-    return 1;
+	if (nextDrones >= connection.hub->max_drones)
+		return 0;
+	unsigned int limit = std::min({drones, hubSpace, connection.max_link_capacity});
+	return std::max(limit, 0u);
 }
 
 bool Algorithm::readyFly(Hub const *hub, Link const &connection)

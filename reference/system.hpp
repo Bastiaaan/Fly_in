@@ -47,14 +47,20 @@ struct Option
 struct Log
 {
 	Drone const *drone;
-	Hub const *hub;
+	Hub const *src;
+	Hub const *dest;
+	int drones_moved;
+	int max_link_capacity;
 	std::string _output;
-	static Log* output(Drone const &d, Hub const &h)
+	static Log* output(Drone const &d, Hub const &src, Hub const &dest, int drones_moved, int max_link_capacity)
 	{
 		auto log = new Log();
 		log->drone = &d;
-		log->hub = &h;
-		log->_output = TextFormat("D%d-%s", d.id, h.name.c_str());
+		log->drones_moved = drones_moved;
+		log->max_link_capacity = max_link_capacity;
+		log->src = &src;
+		log->dest = &dest;
+		log->_output = TextFormat("D%d-%s", d.id, dest.name.c_str());
 		return log;
 	}
 };
@@ -71,6 +77,7 @@ class System
 		int turn;
 		bool is_graphic;
         unsigned long nb_drones;
+		bool verbose_log;
 		std::string mapSrc;
         Map _map;
 		std::map<int, std::vector<Log*>> logs;

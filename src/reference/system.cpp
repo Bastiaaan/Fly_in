@@ -21,6 +21,7 @@ System::System()
     this->level = 0;
     this->score = 0;
     this->difficulty = "TBD";
+	this->verbose_log = false;
     this->turn = 0;
     this->_map = Map();
     this->logs = std::map<int, std::vector<Log*>>();

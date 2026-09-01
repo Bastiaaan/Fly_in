@@ -5,7 +5,7 @@
 
 // must behave like an independent member to make the drones move to the right hubs
 // and to ensure of the shortest route and the least amount of turns.
-// The so-called Dijkstra's algorithm is applied.
+// The so-called greedy-sampling algorithm is applied.
 class Algorithm
 {
     public:

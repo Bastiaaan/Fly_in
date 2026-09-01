@@ -113,7 +113,7 @@ std::vector<Log*> Hub::transferDrone(Link &connection, float hubRadius)
             drone->setDestination(connection.hub, hubRadius);
             this->drones.erase(this->drones.begin());
             connection.hub->drones.push_back(drone);
-            auto _log = Log::output(*drone, *connection.hub);
+            auto _log = Log::output(*drone, *this, *connection.hub, limit, connection.max_link_capacity);
             logs.push_back(_log);
         }
     }

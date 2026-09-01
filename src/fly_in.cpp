@@ -60,7 +60,10 @@ ExecuteState fly_in(System &sys)
 					break;
 				}
                 sys.turn += rotate;
-				sys.verboseLog(sys.logs.size());
+				if (!sys.verbose_log)
+					sys.verboseLog(sys.logs.size());
+				else
+					sys.capacityInfo();
 			}
             else
                 Algorithm::movingDrones(sys);
