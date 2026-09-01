@@ -33,6 +33,7 @@ ExecuteState fly_in(System &sys)
 		for (unsigned int n = 0; n < 2; n++)
 			std::cout << std::endl;
 		std::cout << "========== begin Simulation ==========" << std::endl << std::endl;
+		int buffering = 0;
         while(!WindowShouldClose() || end ->drones.size() != sys.nb_drones)
         {
             BeginDrawing();
@@ -51,19 +52,22 @@ ExecuteState fly_in(System &sys)
 						"Simulation got stuck, quiting soon :(",
 						sizes.screenWidth / 2 - 500,
 						sizes.startActionRadius_y + 40, 50, RED);
-                    WaitTime(1.5);
-            		EndDrawing();
-					std::cout << std::endl << "========== end Simulation ==========";
-					for (unsigned int n = 0; n < 3; n++)
-						std::cout << std::endl;
-					CloseWindow();
-					break;
+					buffering++;
+					if (buffering == 500)
+					{
+                    	WaitTime(1.5);
+            			EndDrawing();
+						std::cout << std::endl << "<nothing has happened thusfar>"
+								  << std::endl << std::endl;
+						std::cout << std::endl << "========== end Simulation ==========";
+						for (unsigned int n = 0; n < 3; n++)
+							std::cout << std::endl;
+						CloseWindow();
+						break;
+					}
 				}
                 sys.turn += rotate;
-				if (!sys.verbose_log)
-					sys.verboseLog(sys.logs.size());
-				else
-					sys.capacityInfo();
+				sys.verboseLog(sys.logs.size());
 			}
             else
                 Algorithm::movingDrones(sys);
