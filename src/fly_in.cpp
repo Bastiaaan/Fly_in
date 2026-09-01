@@ -95,15 +95,3 @@ ExecuteState fly_in(System &sys)
         return ExecuteState::Fail(ex.what());
     }
 }
-
-/*
-Please ask the reviewee to add a simple modification to their drone simulation program.
-Ask them to add a "--capacity-info" flag that displays capacity information during simulation,
-such as "Zone X: Y/Z drones, Connection A-B: Y/Z capacity used" for each turn.
-
-For example, "./main.py --capacity-info map.txt" should output the normal simulation plus
-capacity usage information. The reviewee should be able to locate the relevant
-parsing and output code, make the necessary modifications, and demonstrate that it works
-with a test case. The entire task, including the demonstration, should take no more
-than 10 minutes. Was this procedure followed and did everything work correctly?
-*/

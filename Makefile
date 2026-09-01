@@ -81,4 +81,4 @@ clean:
 fclean: clean
 	@rm -f $(NAME) $(DEBUG_NAME)
 	+$(MAKE) -C $(PARS_REF) full_clean
-	@echo "full cleaning obj/ folder AND fly-in binaries AND removing .venv and __pycach__"
+	@echo "full cleaning obj/ folder AND fly-in binaries AND removing .venv and __pycache__"
